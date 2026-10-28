@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import mealplanner.domain.Ingredient;
 
+/** The one SQLite database shared by every repository. */
 public class Database {
 
     private final String url;
@@ -24,7 +25,7 @@ public class Database {
         }
     }
 
-    /** Creates the tables if they do not exist. */
+    /** Creates the tables if they do not exist (F01-F08). */
     public void migrate() {
         try (Connection c = connection(); Statement st = c.createStatement()) {
             st.executeUpdate("""
@@ -79,7 +80,7 @@ public class Database {
                     CREATE TABLE IF NOT EXISTS recipe (
                         id           INTEGER PRIMARY KEY AUTOINCREMENT,
                         name         TEXT NOT NULL,
-                        cuisine      TEXT,
+                        categories   TEXT NOT NULL DEFAULT '',
                         cook_minutes INTEGER NOT NULL DEFAULT 0,
                         servings     INTEGER NOT NULL,
                         instructions TEXT NOT NULL DEFAULT '',
@@ -107,7 +108,7 @@ public class Database {
                         id            INTEGER PRIMARY KEY CHECK (id = 1),
                         restrictions  TEXT NOT NULL DEFAULT '',
                         allergies     TEXT NOT NULL DEFAULT '',
-                        cuisines      TEXT NOT NULL DEFAULT '',
+                        favourite_categories TEXT NOT NULL DEFAULT '',
                         goal_calories REAL NOT NULL,
                         goal_protein  REAL NOT NULL,
                         goal_carbs    REAL NOT NULL,
@@ -117,7 +118,7 @@ public class Database {
                     CREATE TABLE IF NOT EXISTS catalog_recipe (
                         id           INTEGER PRIMARY KEY AUTOINCREMENT,
                         name         TEXT NOT NULL,
-                        cuisine      TEXT,
+                        categories   TEXT NOT NULL DEFAULT '',
                         cook_minutes INTEGER NOT NULL DEFAULT 0,
                         servings     INTEGER NOT NULL,
                         instructions TEXT NOT NULL DEFAULT '',
@@ -131,7 +132,8 @@ public class Database {
                         amount        REAL NOT NULL,
                         unit          TEXT NOT NULL
                     )""");
-            // F08: add the nutrition column to an older database if it is missing
+            // F08: nutrition per serving of library recipes (JSON, like the catalogue). Added with ALTER TABLE
+            // so a database made by an earlier version gets the column too.
             boolean hasNutrition = false;
             try (ResultSet rs = st.executeQuery("PRAGMA table_info(recipe)")) {
                 while (rs.next()) {
@@ -146,10 +148,16 @@ public class Database {
         }
     }
 
+    /** Path of the bundled list of known ingredients (on the classpath, or a file path). */
     public static final String INGREDIENTS_JSON = "/data/ingredients.json";
+    /** Path of the built-in recipe catalogue used by recommendations (F07). */
     public static final String CATALOG_JSON = "/data/recipe-catalog.json";
 
-    /** Loads the bundled ingredient list. INSERT OR IGNORE never changes existing rows. */
+    /**
+     * Loads the bundled data. Ingredients are added with INSERT OR IGNORE on every start, so names added to
+     * ingredients.json in a later version reach an existing database (existing rows are never changed).
+     * The recipe catalogue is loaded only when its table is empty.
+     */
     public void seedIfEmpty(SeedLoader loader) {
         try (Connection c = connection()) {
             c.setAutoCommit(false);

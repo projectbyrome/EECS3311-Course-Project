@@ -9,17 +9,27 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import mealplanner.domain.CategoryGroup;
 import mealplanner.domain.Ingredient;
 import mealplanner.domain.NutritionSummary;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
+import mealplanner.domain.RecipeCategory;
 import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.Unit;
 
+/**
+ * Reads the bundled JSON data files. A path starting with "/" is looked up on the classpath first
+ * (src/main/resources), otherwise it is read as a normal file.
+ */
 public class SeedLoader {
 
     private final ObjectMapper json = new ObjectMapper();
 
+    /**
+     * Format: [{"name": "eggs", "category": "Dairy & Eggs", "gramsPerPiece": 50, "densityGPerMl": 0,
+     *           "allergens": ["egg"], "fdcId": null}, ...]
+     */
     public List<Ingredient> loadIngredients(String path) {
         List<Ingredient> list = new ArrayList<>();
         for (JsonNode n : read(path)) {
@@ -37,12 +47,17 @@ public class SeedLoader {
         return list;
     }
 
-    /** Sample recipes to try the app before the Recipe Library (F08) exists. Unknown ingredients are skipped. */
+    /**
+     * Temporary sample recipes so the app can be tried before the Recipe Library (F08) exists. Format:
+     * [{"name": "Omelette", "servings": 1, "cuisine": "French", "cookMinutes": 10,
+     *   "ingredients": [{"name": "eggs", "amount": 3, "unit": "PIECE"}], "instructions": ["..."]}]
+     * Lines whose ingredient is not in the ingredient list are skipped.
+     */
     public List<Recipe> loadSampleRecipes(String path, IngredientRepository ingredients) {
         List<Recipe> list = new ArrayList<>();
         for (JsonNode n : read(path)) {
             Recipe r = new Recipe(0, n.path("name").asText(), n.path("servings").asInt(1));
-            r.setCuisine(n.path("cuisine").asText(null));
+            readCategories(n, r);
             r.setCookMinutes(n.path("cookMinutes").asInt(0));
             for (JsonNode step : n.path("instructions")) {
                 r.getInstructions().add(step.asText());
@@ -57,12 +72,16 @@ public class SeedLoader {
         return list;
     }
 
-    /** The built-in recipe catalogue (F07). Like the samples, plus nutrition. Unknown ingredients are an error. */
+    /**
+     * The built-in recipe catalogue for recommendations (F07). Same format as the sample recipes, plus
+     * "nutritionPerServing": {"calories": .., "carbsG": .., "proteinG": .., "fatG": .., "sugarG": ..}.
+     * Unlike the sample recipes, an unknown ingredient is an error: the catalogue ships with the app.
+     */
     public List<Recipe> loadCatalog(String path, IngredientRepository ingredients) {
         List<Recipe> list = new ArrayList<>();
         for (JsonNode n : read(path)) {
             Recipe r = new Recipe(0, n.path("name").asText(), n.path("servings").asInt(1));
-            r.setCuisine(n.path("cuisine").asText(null));
+            readCategories(n, r);
             r.setCookMinutes(n.path("cookMinutes").asInt(0));
             for (JsonNode step : n.path("instructions")) {
                 r.getInstructions().add(step.asText());
@@ -83,6 +102,16 @@ public class SeedLoader {
             list.add(r);
         }
         return list;
+    }
+
+    /** Format: "categories": {"DISH_TYPE": ["Omelettes"], "FLAVOR": ["Savory", "Cheesy"]} */
+    private static void readCategories(JsonNode n, Recipe r) {
+        n.path("categories").fields().forEachRemaining(group -> {
+            CategoryGroup g = CategoryGroup.valueOf(group.getKey());
+            for (JsonNode value : group.getValue()) {
+                r.addCategory(new RecipeCategory(g, value.asText()));
+            }
+        });
     }
 
     private JsonNode read(String path) {

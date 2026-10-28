@@ -1,0 +1,497 @@
+[
+  {
+    "name": "eggs",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 50,
+    "densityGPerMl": 0,
+    "allergens": [
+      "egg"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "milk",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.03,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "butter",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.91,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "cheddar cheese",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "plain yogurt",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.03,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "chicken breast",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 175,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "ground beef",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "salmon fillet",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 170,
+    "densityGPerMl": 0,
+    "allergens": [
+      "fish"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "bacon",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 15,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "tofu",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "soy"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "banana",
+    "category": "Produce",
+    "gramsPerPiece": 120,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "apple",
+    "category": "Produce",
+    "gramsPerPiece": 180,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "onion",
+    "category": "Produce",
+    "gramsPerPiece": 110,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "garlic",
+    "category": "Produce",
+    "gramsPerPiece": 5,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "tomato",
+    "category": "Produce",
+    "gramsPerPiece": 120,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "potato",
+    "category": "Produce",
+    "gramsPerPiece": 170,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "carrot",
+    "category": "Produce",
+    "gramsPerPiece": 60,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "spinach",
+    "category": "Produce",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "bell pepper",
+    "category": "Produce",
+    "gramsPerPiece": 150,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "lettuce",
+    "category": "Produce",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "lemon",
+    "category": "Produce",
+    "gramsPerPiece": 60,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "broccoli",
+    "category": "Produce",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "avocado",
+    "category": "Produce",
+    "gramsPerPiece": 150,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "tortilla",
+    "category": "Bakery",
+    "gramsPerPiece": 45,
+    "densityGPerMl": 0,
+    "allergens": [
+      "gluten"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "bread",
+    "category": "Bakery",
+    "gramsPerPiece": 30,
+    "densityGPerMl": 0,
+    "allergens": [
+      "gluten"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "all-purpose flour",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.53,
+    "allergens": [
+      "gluten"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "white rice",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.85,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "pasta",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "gluten"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "rolled oats",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.41,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "kidney beans",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "canned tomatoes",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "sugar",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.85,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "olive oil",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.91,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "honey",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.42,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "peanut butter",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.09,
+    "allergens": [
+      "peanut"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "soy sauce",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.15,
+    "allergens": [
+      "soy",
+      "gluten"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "salt",
+    "category": "Spices",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 1.2,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "black pepper",
+    "category": "Spices",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.5,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "chili powder",
+    "category": "Spices",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.5,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "shrimp",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "shellfish"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "pork chop",
+    "category": "Meat & Fish",
+    "gramsPerPiece": 200,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "parmesan cheese",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "mozzarella cheese",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "feta cheese",
+    "category": "Dairy & Eggs",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [
+      "milk"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "basil",
+    "category": "Produce",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "cucumber",
+    "category": "Produce",
+    "gramsPerPiece": 300,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "ginger",
+    "category": "Produce",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "lime",
+    "category": "Produce",
+    "gramsPerPiece": 65,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "green onion",
+    "category": "Produce",
+    "gramsPerPiece": 15,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "mushrooms",
+    "category": "Produce",
+    "gramsPerPiece": 18,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "chickpeas",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "black beans",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "quinoa",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.72,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "coconut milk",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.97,
+    "allergens": [],
+    "fdcId": null
+  },
+  {
+    "name": "almonds",
+    "category": "Pantry",
+    "gramsPerPiece": 1.2,
+    "densityGPerMl": 0,
+    "allergens": [
+      "tree nut"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "sesame oil",
+    "category": "Pantry",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.92,
+    "allergens": [
+      "sesame"
+    ],
+    "fdcId": null
+  },
+  {
+    "name": "curry powder",
+    "category": "Spices",
+    "gramsPerPiece": 0,
+    "densityGPerMl": 0.4,
+    "allergens": [],
+    "fdcId": null
+  }
+]

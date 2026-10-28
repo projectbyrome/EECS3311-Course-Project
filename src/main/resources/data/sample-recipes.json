@@ -1,0 +1,197 @@
+[
+  {
+    "name": "Omelette",
+    "servings": 1,
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Omelettes"
+      ],
+      "FLAVOR": [
+        "Savory",
+        "Cheesy",
+        "Buttery"
+      ],
+      "MAIN_INGREDIENT": [
+        "Eggs",
+        "Cheese"
+      ]
+    },
+    "cookMinutes": 10,
+    "ingredients": [
+      {
+        "name": "eggs",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "butter",
+        "amount": 10,
+        "unit": "G"
+      },
+      {
+        "name": "cheddar cheese",
+        "amount": 30,
+        "unit": "G"
+      }
+    ],
+    "instructions": [
+      "Whisk the eggs.",
+      "Melt the butter in a pan and cook the eggs.",
+      "Add the cheese and fold."
+    ]
+  },
+  {
+    "name": "Chicken Wrap",
+    "servings": 1,
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Wrap"
+      ],
+      "FLAVOR": [
+        "Savory"
+      ],
+      "MAIN_INGREDIENT": [
+        "Poultry",
+        "Vegetables"
+      ]
+    },
+    "cookMinutes": 15,
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "amount": 150,
+        "unit": "G"
+      },
+      {
+        "name": "tortilla",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "lettuce",
+        "amount": 30,
+        "unit": "G"
+      },
+      {
+        "name": "tomato",
+        "amount": 0.5,
+        "unit": "PIECE"
+      }
+    ],
+    "instructions": [
+      "Cook and slice the chicken.",
+      "Fill the tortilla and roll it up."
+    ]
+  },
+  {
+    "name": "Chili",
+    "servings": 4,
+    "categories": {
+      "COOKING_METHOD": [
+        "Stewed"
+      ],
+      "DISH_TYPE": [
+        "Stew"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Savory",
+        "Rich"
+      ],
+      "MAIN_INGREDIENT": [
+        "Meat",
+        "Beans"
+      ]
+    },
+    "cookMinutes": 45,
+    "ingredients": [
+      {
+        "name": "ground beef",
+        "amount": 500,
+        "unit": "G"
+      },
+      {
+        "name": "kidney beans",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "onion",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "chili powder",
+        "amount": 2,
+        "unit": "TBSP"
+      }
+    ],
+    "instructions": [
+      "Brown the beef with the onion.",
+      "Add the rest and simmer for 30 minutes."
+    ]
+  },
+  {
+    "name": "Overnight Oats",
+    "servings": 1,
+    "categories": {
+      "COOKING_METHOD": [
+        "Raw"
+      ],
+      "DISH_TYPE": [
+        "Porridge",
+        "Bowls"
+      ],
+      "FLAVOR": [
+        "Sweet",
+        "Fruity",
+        "Mild"
+      ],
+      "MAIN_INGREDIENT": [
+        "Grains",
+        "Fruits",
+        "Dairy"
+      ],
+      "OTHER": [
+        "Make-Ahead Breakfast"
+      ]
+    },
+    "cookMinutes": 5,
+    "ingredients": [
+      {
+        "name": "rolled oats",
+        "amount": 0.5,
+        "unit": "CUP"
+      },
+      {
+        "name": "milk",
+        "amount": 120,
+        "unit": "ML"
+      },
+      {
+        "name": "banana",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "honey",
+        "amount": 1,
+        "unit": "TSP"
+      }
+    ],
+    "instructions": [
+      "Mix everything in a jar and leave it in the fridge overnight."
+    ]
+  }
+]

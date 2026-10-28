@@ -13,13 +13,19 @@ import java.util.List;
 import java.util.Optional;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
+import mealplanner.domain.RecipeCategory;
 import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.RecipeSource;
 import mealplanner.domain.Unit;
 
+/**
+ * SQLite implementation of RecipeRepository (the user's recipe library). Archived recipes are still
+ * returned, so meals already in the calendar keep working; RecipeLibraryService hides them.
+ * F08 adds the nutrition column (nutrition per serving as JSON, the same format as the catalogue).
+ */
 public class SqliteRecipeRepository implements RecipeRepository {
 
-    private static final String SELECT = "SELECT id, name, cuisine, cook_minutes, servings, instructions, warnings, "
+    private static final String SELECT = "SELECT id, name, categories, cook_minutes, servings, instructions, warnings, "
             + "favourite, archived, source, catalog_id, nutrition FROM recipe ";
 
     private final Database db;
@@ -33,6 +39,7 @@ public class SqliteRecipeRepository implements RecipeRepository {
         return query(SELECT + "WHERE id = ?", id).stream().findFirst();
     }
 
+    /** Recipes whose name contains the query, without case ("" returns every recipe). */
     @Override
     public List<Recipe> search(String query) {
         String q = query == null ? "" : query.trim();
@@ -44,23 +51,24 @@ public class SqliteRecipeRepository implements RecipeRepository {
         return query(SELECT + "ORDER BY name", null);
     }
 
+    /** Inserts (id 0 gets a new id) or updates the recipe, and rewrites its ingredient lines. */
     @Override
     public long save(Recipe r) {
         try (Connection c = db.connection()) {
             c.setAutoCommit(false);
             String sql = r.getId() == 0
-                    ? "INSERT INTO recipe(name, cuisine, cook_minutes, servings, instructions, warnings, favourite, "
+                    ? "INSERT INTO recipe(name, categories, cook_minutes, servings, instructions, warnings, favourite, "
                     + "archived, source, catalog_id, nutrition) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
-                    : "INSERT INTO recipe(name, cuisine, cook_minutes, servings, instructions, warnings, favourite, "
+                    : "INSERT INTO recipe(name, categories, cook_minutes, servings, instructions, warnings, favourite, "
                     + "archived, source, catalog_id, nutrition, id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) "
-                    + "ON CONFLICT(id) DO UPDATE SET name = excluded.name, cuisine = excluded.cuisine, "
+                    + "ON CONFLICT(id) DO UPDATE SET name = excluded.name, categories = excluded.categories, "
                     + "cook_minutes = excluded.cook_minutes, servings = excluded.servings, "
                     + "instructions = excluded.instructions, warnings = excluded.warnings, "
                     + "favourite = excluded.favourite, archived = excluded.archived, "
                     + "source = excluded.source, catalog_id = excluded.catalog_id, nutrition = excluded.nutrition";
             try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, r.getName());
-                ps.setString(2, r.getCuisine());
+                ps.setString(2, String.join("\n", r.getCategories().stream().map(RecipeCategory::toKey).toList()));
                 ps.setInt(3, r.getCookMinutes());
                 ps.setInt(4, r.getServings());
                 ps.setString(5, String.join("\n", r.getInstructions()));
@@ -121,7 +129,9 @@ public class SqliteRecipeRepository implements RecipeRepository {
 
     private static Recipe read(ResultSet rs) throws SQLException, IOException {
         Recipe r = new Recipe(rs.getLong("id"), rs.getString("name"), rs.getInt("servings"));
-        r.setCuisine(rs.getString("cuisine"));
+        for (String key : lines(rs.getString("categories"))) {
+            r.addCategory(RecipeCategory.parse(key));
+        }
         r.setCookMinutes(rs.getInt("cook_minutes"));
         r.getInstructions().addAll(lines(rs.getString("instructions")));
         r.setWarnings(lines(rs.getString("warnings")));
