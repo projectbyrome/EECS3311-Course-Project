@@ -62,7 +62,7 @@ public class MealCalendarService implements EventListener {
         }
         Recipe recipe = recipeLibraryService.getById(recipeId);
         DayPlan day = getDay(date);
-        if (day.isClosed()) {
+        if (day.isClosed() || date.isBefore(LocalDate.now())) {
             throw new InvalidInputException("Cannot add a meal to a day that has passed: " + date);
         }
         MealEntry entry = new MealEntry(slot, recipe, servings);

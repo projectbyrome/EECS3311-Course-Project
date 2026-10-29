@@ -128,6 +128,7 @@ public class MealCalendarView extends BorderPane implements EventListener {
     }
 
     private VBox slotCell(DayPlan day, MealSlot slot) {
+        boolean past = day.isClosed() || day.getDate().isBefore(LocalDate.now());
         VBox cell = new VBox(4);
         cell.setPadding(new Insets(4));
         cell.setStyle("-fx-border-color: #cccccc; -fx-min-width: 120; -fx-min-height: 60;");
