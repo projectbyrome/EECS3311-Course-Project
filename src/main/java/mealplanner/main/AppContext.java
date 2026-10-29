@@ -15,16 +15,19 @@ import mealplanner.data.SqliteIngredientRepository;
 import mealplanner.data.SqlitePantryRepository;
 import mealplanner.data.SqliteRecipeRepository;
 import mealplanner.domain.Recipe;
+import mealplanner.events.CalendarChanged;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
 import mealplanner.service.RecipeLibraryService;
 import mealplanner.service.UnitConverter;
+import mealplanner.ui.MainWindow;
+import mealplanner.ui.MealCalendarView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
- * subscriptions and registers the CLI commands.
+ * subscriptions and registers the CLI commands. Nothing else in the program creates services.
  */
 public class AppContext {
 
@@ -36,6 +39,7 @@ public class AppContext {
     private final EventBus eventBus = new EventBus();
     private AppFacade facade;
     private MealCalendarService mealCalendarService;
+    private MainWindow mainWindow;
     private CliApp cliApp;
 
     private AppContext(AppConfig config, UiMode mode) {
@@ -55,6 +59,19 @@ public class AppContext {
 
     public EventBus eventBus() {
         return eventBus;
+    }
+
+    /** Built on first use, because JavaFX controls must be created on the JavaFX thread. */
+    public MainWindow mainWindow() {
+        if (mode != UiMode.GUI) {
+            throw new IllegalStateException("The window is only built in GUI mode");
+        }
+        if (mainWindow == null) {
+            MealCalendarView calendarView = new MealCalendarView(facade);
+            eventBus.subscribe(CalendarChanged.class, calendarView);
+            mainWindow = new MainWindow(calendarView);
+        }
+        return mainWindow;
     }
 
     public CliApp cliApp() {
