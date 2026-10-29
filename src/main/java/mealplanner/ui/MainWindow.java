@@ -26,7 +26,7 @@ public class MainWindow {
     private final ToggleGroup group = new ToggleGroup();
     private final List<ToggleButton> buttons = new ArrayList<>();
 
-    public MainWindow(MealCalendarView calendarView) {
+    public MainWindow(MealCalendarView calendarView, ChecklistView checklistView) {
         Button toggle = new Button("☰");
         toggle.setOnAction(e -> toggleMenu());
         Label title = new Label("Meal Planner");
@@ -43,7 +43,7 @@ public class MainWindow {
         root.setLeft(menu);
 
         addPage("Meal Calendar", calendarView);
-        // Later steps add one line each, e.g. addPage("Shopping List", checklistView);
+        addPage("Shopping", checklistView);
 
         buttons.get(0).setSelected(true);
     }

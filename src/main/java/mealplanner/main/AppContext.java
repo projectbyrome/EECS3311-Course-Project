@@ -5,23 +5,28 @@ import java.nio.file.Path;
 import java.util.Scanner;
 import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
+import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
 import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
 import mealplanner.data.RecipeRepository;
 import mealplanner.data.SeedLoader;
 import mealplanner.data.SqliteCalendarRepository;
+import mealplanner.data.SqliteChecklistRepository;
 import mealplanner.data.SqliteIngredientRepository;
 import mealplanner.data.SqlitePantryRepository;
 import mealplanner.data.SqliteRecipeRepository;
 import mealplanner.domain.Recipe;
 import mealplanner.events.CalendarChanged;
+import mealplanner.events.ChecklistChanged;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
+import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
 import mealplanner.service.RecipeLibraryService;
 import mealplanner.service.UnitConverter;
+import mealplanner.ui.ChecklistView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
 
@@ -68,8 +73,11 @@ public class AppContext {
         }
         if (mainWindow == null) {
             MealCalendarView calendarView = new MealCalendarView(facade);
+            ChecklistView checklistView = new ChecklistView(facade);
             eventBus.subscribe(CalendarChanged.class, calendarView);
-            mainWindow = new MainWindow(calendarView);
+            eventBus.subscribe(ChecklistChanged.class, checklistView);
+            eventBus.subscribe(PantryChanged.class, checklistView);
+            mainWindow = new MainWindow(calendarView, checklistView);
         }
         return mainWindow;
     }
@@ -79,6 +87,7 @@ public class AppContext {
             Scanner in = new Scanner(System.in);
             cliApp = new CliApp(in, System.out);
             cliApp.register(new CalendarCommand(facade, in, System.out));
+            cliApp.register(new ChecklistCommand(facade, in, System.out));
         }
         return cliApp;
     }
@@ -99,8 +108,10 @@ public class AppContext {
         RecipeLibraryService recipeLibraryService = new RecipeLibraryService(recipeRepo);
         mealCalendarService = new MealCalendarService(new SqliteCalendarRepository(db, recipeRepo),
                 recipeLibraryService, pantryService, eventBus);
+        ChecklistService checklistService = new ChecklistService(new SqliteChecklistRepository(db),
+                pantryService, eventBus);
 
-        facade = new AppFacade(mealCalendarService, recipeLibraryService);
+        facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService);
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

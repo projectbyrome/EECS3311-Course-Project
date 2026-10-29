@@ -1,10 +1,12 @@
 package mealplanner.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mealplanner.data.IngredientRepository;
 import mealplanner.data.PantryRepository;
+import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.Ingredient;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
@@ -12,11 +14,11 @@ import mealplanner.domain.Recipe;
 import mealplanner.domain.RecipeIngredient;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
+import mealplanner.model.FinishResult;
 
 /**
- * Pantry logic. For F01 only the parts the calendar needs are written:
- * missingFor() (meal flags) and consume() (end-of-day update).
- * add/update/remove/addPurchased come with F04 and F02.
+ * Pantry logic. Written so far: missingFor() and consume() (F01), addPurchased() and
+ * findByIngredient() (F02). add/update/remove come with F04.
  */
 public class PantryService {
 
@@ -101,6 +103,42 @@ public class PantryService {
                 .flatMap(i -> pantryRepository.findByIngredient(i.getId()));
     }
 
+    /**
+     * Finish Shopping (F02): moves the ticked checklist items into the pantry.
+     * Known items are added to what is already there (converted with UnitConverter);
+     * if the units cannot be combined the item becomes a separate pantry entry (UC02 6b);
+     * unknown names are not moved and are listed in notAdded (UC02 6a).
+     */
+    public FinishResult addPurchased(List<ChecklistItem> items) {
+        int moved = 0;
+        int merged = 0;
+        List<String> notAdded = new ArrayList<>();
+        for (ChecklistItem bought : items) {
+            Optional<Ingredient> known = ingredientRepository.findByName(bought.getName());
+            if (known.isEmpty()) {
+                notAdded.add(bought.getName());
+                continue;
+            }
+            Ingredient ingredient = known.get();
+            Quantity q = bought.getQuantity();
+            Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+            if (existing.isPresent()
+                    && converter.canConvert(q.getUnit(), existing.get().getQuantity().getUnit(), ingredient)) {
+                PantryItem item = existing.get();
+                Quantity have = item.getQuantity();
+                item.setQuantity(have.plus(converter.convert(q, have.getUnit(), ingredient)));
+                pantryRepository.save(item);
+                merged++;
+            } else {
+                pantryRepository.save(new PantryItem(0, ingredient, q, LocalDate.now()));
+            }
+            moved++;
+        }
+        if (moved > 0) {
+            eventBus.publish(new PantryChanged());
+        }
+        return new FinishResult(moved, merged, notAdded);
+    }
+
     // TODO (F04): add(name, quantity), update(itemId, quantity), remove(itemId)
-    // TODO (F02): addPurchased(items): FinishResult
 }
