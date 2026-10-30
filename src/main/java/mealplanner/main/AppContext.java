@@ -7,6 +7,7 @@ import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
 import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
+import mealplanner.cli.PantryCommand;
 import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
 import mealplanner.data.RecipeRepository;
@@ -29,6 +30,7 @@ import mealplanner.service.UnitConverter;
 import mealplanner.ui.ChecklistView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
+import mealplanner.ui.PantryView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
@@ -76,8 +78,10 @@ public class AppContext {
             ChecklistView checklistView = new ChecklistView(facade);
             eventBus.subscribe(CalendarChanged.class, calendarView);
             eventBus.subscribe(ChecklistChanged.class, checklistView);
+            PantryView pantryView = new PantryView(facade);
             eventBus.subscribe(PantryChanged.class, checklistView);
-            mainWindow = new MainWindow(calendarView, checklistView);
+            eventBus.subscribe(PantryChanged.class, pantryView);
+            mainWindow = new MainWindow(calendarView, checklistView, pantryView);
         }
         return mainWindow;
     }
@@ -88,6 +92,7 @@ public class AppContext {
             cliApp = new CliApp(in, System.out);
             cliApp.register(new CalendarCommand(facade, in, System.out));
             cliApp.register(new ChecklistCommand(facade, in, System.out));
+            cliApp.register(new PantryCommand(facade, in, System.out));
         }
         return cliApp;
     }

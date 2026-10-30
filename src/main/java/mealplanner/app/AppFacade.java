@@ -6,6 +6,7 @@ import mealplanner.domain.Checklist;
 import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.DayPlan;
 import mealplanner.domain.MealSlot;
+import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
 import mealplanner.model.FinishResult;
@@ -76,6 +77,24 @@ public class AppFacade {
 
     public FinishResult finishShopping(long checklistId) {
         return checklistService.finishShopping(checklistId);
+    }
+
+    // ---- F04 pantry ----
+
+    public List<PantryItem> getPantry() {
+        return pantryService.getItems();
+    }
+
+    public PantryItem addPantryItem(String name, Quantity quantity) {
+        return pantryService.add(name, quantity);
+    }
+
+    public void updatePantryItem(long itemId, Quantity quantity) {
+        pantryService.update(itemId, quantity);
+    }
+
+    public void removePantryItem(long itemId) {
+        pantryService.remove(itemId);
     }
 
     // ---- F08 recipe library (only what the calendar needs to pick a recipe) ----

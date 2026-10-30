@@ -8,6 +8,7 @@ import mealplanner.data.IngredientRepository;
 import mealplanner.data.PantryRepository;
 import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.Ingredient;
+import mealplanner.domain.InvalidInputException;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
@@ -17,8 +18,8 @@ import mealplanner.events.PantryChanged;
 import mealplanner.model.FinishResult;
 
 /**
- * Pantry logic. Written so far: missingFor() and consume() (F01), addPurchased() and
- * findByIngredient() (F02). add/update/remove come with F04.
+ * Pantry logic (F04, CD4): validates and merges pantry items. Also used by F01 (missingFor, consume)
+ * and F02 (addPurchased, findByIngredient). Every change publishes PantryChanged (Observer).
  */
 public class PantryService {
 
@@ -69,6 +70,7 @@ public class PantryService {
     /**
      * Removes used ingredients from the pantry (SD08). If there is not enough, the item goes to 0
      * and a warning is returned so the UI can show a notice.
+     * (Design returns void; returning the warnings is how SD08's "show a notice" gets its text.)
      */
     public List<String> consume(List<RecipeIngredient> ingredients) {
         List<String> warnings = new ArrayList<>();
@@ -140,5 +142,61 @@ public class PantryService {
         return new FinishResult(moved, merged, notAdded);
     }
 
-    // TODO (F04): add(name, quantity), update(itemId, quantity), remove(itemId)
+    /**
+     * SD02 / UC04: adds an ingredient to the pantry. The name must be a known ingredient (2a) and the
+     * amount greater than 0 (3a). If the ingredient is already there, the amounts are added together,
+     * converted with UnitConverter; if the units cannot be combined it becomes a separate entry.
+     */
+    public PantryItem add(String name, Quantity quantity) {
+        String cleanName = name == null ? "" : name.trim();
+        Ingredient ingredient = ingredientRepository.findByName(cleanName)
+                .orElseThrow(() -> new InvalidInputException("Unknown ingredient: " + cleanName));
+        requirePositive(quantity);
+        Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+        PantryItem item;
+        if (existing.isPresent()
+                && converter.canConvert(quantity.getUnit(), existing.get().getQuantity().getUnit(), ingredient)) {
+            item = existing.get();
+            Quantity have = item.getQuantity();
+            item.setQuantity(have.plus(converter.convert(quantity, have.getUnit(), ingredient)));
+        } else {
+            item = new PantryItem(0, ingredient, quantity, LocalDate.now());
+        }
+        pantryRepository.save(item);
+        eventBus.publish(new PantryChanged());
+        return item;
+    }
+
+    /** Sets a new quantity on a pantry item (UC04 "changes its quantity"). 0 is allowed; negative is not. */
+    public void update(long itemId, Quantity quantity) {
+        if (quantity == null) {
+            throw new InvalidInputException("Enter an amount and a unit");
+        }
+        PantryItem item = requireItem(itemId);
+        item.setQuantity(quantity);
+        pantryRepository.save(item);
+        eventBus.publish(new PantryChanged());
+    }
+
+    public void remove(long itemId) {
+        requireItem(itemId);
+        pantryRepository.delete(itemId);
+        eventBus.publish(new PantryChanged());
+    }
+
+    private PantryItem requireItem(long itemId) {
+        return pantryRepository.findAll().stream()
+                .filter(i -> i.getId() == itemId)
+                .findFirst()
+                .orElseThrow(() -> new InvalidInputException("No pantry item with id " + itemId));
+    }
+
+    private static void requirePositive(Quantity quantity) {
+        if (quantity == null) {
+            throw new InvalidInputException("Enter an amount and a unit");
+        }
+        if (quantity.getAmount() <= 0 || Double.isNaN(quantity.getAmount()) || Double.isInfinite(quantity.getAmount())) {
+            throw new InvalidInputException("Amount must be greater than 0");
+        }
+    }
 }
