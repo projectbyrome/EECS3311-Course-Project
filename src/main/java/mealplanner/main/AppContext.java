@@ -2,12 +2,19 @@ package mealplanner.main;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Scanner;
+import mealplanner.agent.PromptBuilder;
+import mealplanner.agent.ResponseParser;
+import mealplanner.agent.llm.ClaudeClient;
+import mealplanner.agent.llm.LLMClient;
+import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
 import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
 import mealplanner.cli.PantryCommand;
+import mealplanner.cli.ShoppingCommand;
 import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
 import mealplanner.data.RecipeRepository;
@@ -26,6 +33,8 @@ import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
 import mealplanner.service.RecipeLibraryService;
+import mealplanner.service.ShoppingDraftValidator;
+import mealplanner.service.ShoppingNeedsCalculator;
 import mealplanner.service.UnitConverter;
 import mealplanner.ui.ChecklistView;
 import mealplanner.ui.MainWindow;
@@ -92,12 +101,18 @@ public class AppContext {
             cliApp = new CliApp(in, System.out);
             cliApp.register(new CalendarCommand(facade, in, System.out));
             cliApp.register(new ChecklistCommand(facade, in, System.out));
+            cliApp.register(new ShoppingCommand(facade, in, System.out));
             cliApp.register(new PantryCommand(facade, in, System.out));
         }
         return cliApp;
     }
 
     private void buildServices() {
+        LLMClient llm = new ClaudeClient(config.anthropicApiKey, config.model, Duration.ofSeconds(30));
+        buildServices(llm);
+    }
+
+    private void buildServices(LLMClient llm) {
         Database db = openDatabase();
         SeedLoader seedLoader = new SeedLoader();
         db.seedIfEmpty(seedLoader);
@@ -107,6 +122,8 @@ public class AppContext {
         seedSampleRecipes(seedLoader, ingredientRepo, recipeRepo);
 
         UnitConverter converter = new UnitConverter();
+        PromptBuilder promptBuilder = new PromptBuilder();
+        ResponseParser responseParser = new ResponseParser();
 
         PantryService pantryService = new PantryService(new SqlitePantryRepository(db), ingredientRepo,
                 converter, eventBus);
@@ -116,7 +133,12 @@ public class AppContext {
         ChecklistService checklistService = new ChecklistService(new SqliteChecklistRepository(db),
                 pantryService, eventBus);
 
-        facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService);
+        ShoppingListGenerator shoppingListGenerator = new ShoppingListGenerator(
+                new ShoppingNeedsCalculator(converter), recipeLibraryService, pantryService, llm,
+                promptBuilder, responseParser, new ShoppingDraftValidator(converter));
+
+        facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService,
+                shoppingListGenerator);
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

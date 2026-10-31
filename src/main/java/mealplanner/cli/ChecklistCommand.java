@@ -12,7 +12,7 @@ import mealplanner.domain.Quantity;
 import mealplanner.domain.Unit;
 import mealplanner.model.FinishResult;
 
-/** F02 from the command line: checklist list | new | add | check | finish. */
+/** F02 from the command line: checklist list | new | add | check | finish | remove | delete. */
 public class ChecklistCommand extends AbstractCliCommand {
 
     public ChecklistCommand(AppFacade facade, Scanner in, PrintStream out) {
@@ -31,7 +31,9 @@ public class ChecklistCommand extends AbstractCliCommand {
                 checklist new    --name "Weekly shop"
                 checklist add    --list id --item eggs --amount 12 --unit PIECE
                 checklist check  --item id [--off]   (tick or untick an item)
-                checklist finish --list id           (moves ticked items into the pantry)""";
+                checklist finish --list id           (moves ticked items into the pantry)
+                checklist remove --item id           (takes one item off its checklist)
+                checklist delete --list id           (deletes the whole checklist)""";
     }
 
     @Override
@@ -51,6 +53,14 @@ public class ChecklistCommand extends AbstractCliCommand {
             case "finish" -> {
                 FinishResult r = facade.finishShopping(parseLong(requireOption(args, "list"), "list"));
                 yield CommandResult.ok(r.toString());
+            }
+            case "remove" -> {
+                facade.removeChecklistItem(parseLong(requireOption(args, "item"), "item"));
+                yield CommandResult.ok("Item removed.");
+            }
+            case "delete" -> {
+                facade.deleteChecklist(parseLong(requireOption(args, "list"), "list"));
+                yield CommandResult.ok("Checklist deleted.");
             }
             default -> CommandResult.error("Unknown sub-command '" + args.subcommand + "'.\n" + usage());
         };

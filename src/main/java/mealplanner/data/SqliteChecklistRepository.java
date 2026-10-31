@@ -74,6 +74,23 @@ public class SqliteChecklistRepository implements ChecklistRepository {
         }
     }
 
+    @Override
+    public void delete(long id) {
+        try (Connection c = db.connection()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement items = c.prepareStatement("DELETE FROM checklist_item WHERE checklist_id = ?");
+                 PreparedStatement list = c.prepareStatement("DELETE FROM checklist WHERE id = ?")) {
+                items.setLong(1, id);
+                items.executeUpdate();
+                list.setLong(1, id);
+                list.executeUpdate();
+            }
+            c.commit();
+        } catch (SQLException e) {
+            throw new DataAccessException("Cannot delete checklist " + id, e);
+        }
+    }
+
     private void insertItem(Connection c, long checklistId, ChecklistItem item) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO checklist_item(checklist_id, name, amount, unit, checked, in_pantry) VALUES(?,?,?,?,?,?)",

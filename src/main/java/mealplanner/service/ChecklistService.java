@@ -87,6 +87,22 @@ public class ChecklistService {
         eventBus.publish(new ChecklistChanged(checklist.getId()));
     }
 
+    /** Removes one item from its checklist without moving it to the pantry. */
+    public void removeItem(long itemId) {
+        Checklist checklist = checklistRepository.findByItemId(itemId)
+                .orElseThrow(() -> new InvalidInputException("No checklist item with id " + itemId));
+        checklist.removeItem(itemId);
+        checklistRepository.save(checklist);
+        eventBus.publish(new ChecklistChanged(checklist.getId()));
+    }
+
+    /** Deletes a whole checklist and its items. Nothing goes to the pantry. */
+    public void delete(long checklistId) {
+        get(checklistId); // checks that it exists
+        checklistRepository.delete(checklistId);
+        eventBus.publish(new ChecklistChanged(checklistId));
+    }
+
     /**
      * UC02 steps 5-6: ticked items go into the pantry (PantryService publishes PantryChanged),
      * then the checklist keeps only the unticked items.

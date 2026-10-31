@@ -16,4 +16,7 @@ public interface ChecklistRepository {
 
     /** Saves the checklist and its items. New checklists and items get their id here. */
     void save(Checklist checklist);
+
+    /** Deletes the checklist and all its items. */
+    void delete(long id);
 }

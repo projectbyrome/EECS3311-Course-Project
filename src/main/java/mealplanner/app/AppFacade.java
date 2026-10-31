@@ -2,6 +2,7 @@ package mealplanner.app;
 
 import java.time.LocalDate;
 import java.util.List;
+import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.domain.Checklist;
 import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.DayPlan;
@@ -10,6 +11,8 @@ import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
 import mealplanner.model.FinishResult;
+import mealplanner.model.RecipeSelection;
+import mealplanner.model.ShoppingDraft;
 import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
@@ -25,13 +28,16 @@ public class AppFacade {
     private final RecipeLibraryService recipeLibraryService;
     private final PantryService pantryService;
     private final ChecklistService checklistService;
+    private final ShoppingListGenerator shoppingListGenerator;
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
-                     PantryService pantryService, ChecklistService checklistService) {
+                     PantryService pantryService, ChecklistService checklistService,
+                     ShoppingListGenerator shoppingListGenerator) {
         this.mealCalendarService = mealCalendarService;
         this.recipeLibraryService = recipeLibraryService;
         this.pantryService = pantryService;
         this.checklistService = checklistService;
+        this.shoppingListGenerator = shoppingListGenerator;
     }
 
     // ---- F01 meal calendar ----
@@ -75,8 +81,29 @@ public class AppFacade {
         checklistService.setChecked(itemId, checked);
     }
 
+    public void removeChecklistItem(long itemId) {
+        checklistService.removeItem(itemId);
+    }
+
+    public void deleteChecklist(long checklistId) {
+        checklistService.delete(checklistId);
+    }
+
     public FinishResult finishShopping(long checklistId) {
         return checklistService.finishShopping(checklistId);
+    }
+
+    /** F03: may call Claude, so the GUI runs it in a background task. */
+    public ShoppingDraft draftShoppingList(List<RecipeSelection> selections) {
+        return shoppingListGenerator.draft(selections);
+    }
+
+    /** Adds an approved draft to a checklist; a null checklistId creates a new checklist for it. */
+    public Checklist approveShoppingDraft(ShoppingDraft draft, Long checklistId) {
+        long target = checklistId != null
+                ? checklistId
+                : checklistService.create("Shopping list " + LocalDate.now()).getId();
+        return checklistService.addItems(target, draft.items);
     }
 
     // ---- F04 pantry ----

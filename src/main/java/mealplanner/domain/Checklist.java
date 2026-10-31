@@ -39,6 +39,11 @@ public class Checklist {
         items.removeIf(ChecklistItem::isChecked);
     }
 
+    /** Takes one item off the list (the user changed their mind; it does not go to the pantry). */
+    public void removeItem(long itemId) {
+        items.remove(findItem(itemId));
+    }
+
     public ChecklistItem findItem(long itemId) {
         return items.stream()
                 .filter(i -> i.getId() == itemId)
