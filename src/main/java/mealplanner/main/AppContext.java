@@ -16,6 +16,7 @@ import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
 import mealplanner.cli.MacrosCommand;
 import mealplanner.cli.PantryCommand;
+import mealplanner.cli.ProfileCommand;
 import mealplanner.cli.ShoppingCommand;
 import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
@@ -26,6 +27,7 @@ import mealplanner.data.SqliteChecklistRepository;
 import mealplanner.data.SqliteIngredientRepository;
 import mealplanner.data.SqliteNutritionCacheRepository;
 import mealplanner.data.SqlitePantryRepository;
+import mealplanner.data.SqliteProfileRepository;
 import mealplanner.data.SqliteRecipeRepository;
 import mealplanner.domain.Recipe;
 import mealplanner.events.CalendarChanged;
@@ -39,6 +41,7 @@ import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.NutritionService;
 import mealplanner.service.PantryService;
+import mealplanner.service.ProfileService;
 import mealplanner.service.RecipeLibraryService;
 import mealplanner.service.ShoppingDraftValidator;
 import mealplanner.service.ShoppingNeedsCalculator;
@@ -48,6 +51,7 @@ import mealplanner.ui.MacroGeneratorView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
 import mealplanner.ui.PantryView;
+import mealplanner.ui.ProfileView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
@@ -99,7 +103,8 @@ public class AppContext {
             eventBus.subscribe(PantryChanged.class, checklistView);
             eventBus.subscribe(PantryChanged.class, pantryView);
             MacroGeneratorView macroView = new MacroGeneratorView(facade);
-            mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView);
+            ProfileView profileView = new ProfileView(facade);
+            mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, profileView);
         }
         return mainWindow;
     }
@@ -113,6 +118,7 @@ public class AppContext {
             cliApp.register(new ShoppingCommand(facade, in, System.out));
             cliApp.register(new PantryCommand(facade, in, System.out));
             cliApp.register(new MacrosCommand(facade, in, System.out));
+            cliApp.register(new ProfileCommand(facade, in, System.out));
         }
         return cliApp;
     }
@@ -139,6 +145,7 @@ public class AppContext {
                 converter, eventBus);
         NutritionService nutritionService = new NutritionService(
                 new CachedNutritionSource(usda, new SqliteNutritionCacheRepository(db)), ingredientRepo, converter);
+        ProfileService profileService = new ProfileService(new SqliteProfileRepository(db), ingredientRepo, eventBus);
         RecipeLibraryService recipeLibraryService = new RecipeLibraryService(recipeRepo);
         mealCalendarService = new MealCalendarService(new SqliteCalendarRepository(db, recipeRepo),
                 recipeLibraryService, pantryService, eventBus);
@@ -152,7 +159,7 @@ public class AppContext {
                 promptBuilder, responseParser);
 
         facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService,
-                shoppingListGenerator, macroGenerator);
+                shoppingListGenerator, macroGenerator, profileService);
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

@@ -12,6 +12,8 @@ import mealplanner.domain.NutritionSummary;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
+import mealplanner.domain.UserProfile;
+import mealplanner.domain.ValidationReport;
 import mealplanner.model.FinishResult;
 import mealplanner.model.NutritionSelection;
 import mealplanner.model.RecipeSelection;
@@ -19,6 +21,7 @@ import mealplanner.model.ShoppingDraft;
 import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
+import mealplanner.service.ProfileService;
 import mealplanner.service.RecipeLibraryService;
 
 /**
@@ -33,16 +36,19 @@ public class AppFacade {
     private final ChecklistService checklistService;
     private final ShoppingListGenerator shoppingListGenerator;
     private final MacroGenerator macroGenerator;
+    private final ProfileService profileService;
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
                      PantryService pantryService, ChecklistService checklistService,
-                     ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator) {
+                     ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator,
+                     ProfileService profileService) {
         this.mealCalendarService = mealCalendarService;
         this.recipeLibraryService = recipeLibraryService;
         this.pantryService = pantryService;
         this.checklistService = checklistService;
         this.shoppingListGenerator = shoppingListGenerator;
         this.macroGenerator = macroGenerator;
+        this.profileService = profileService;
     }
 
     // ---- F01 meal calendar ----
@@ -134,6 +140,17 @@ public class AppFacade {
     /** May call USDA and Claude, so the GUI runs it in a background task. */
     public NutritionSummary generateMacros(List<NutritionSelection> selections) {
         return macroGenerator.generate(selections);
+    }
+
+    // ---- F06 profile ----
+
+    public UserProfile getProfile() {
+        return profileService.getProfile();
+    }
+
+    /** Saves nothing and returns the problems if a value is invalid (UC06 3a). */
+    public ValidationReport updateProfile(UserProfile profile) {
+        return profileService.update(profile);
     }
 
     // ---- F08 recipe library (only what the calendar needs to pick a recipe) ----
