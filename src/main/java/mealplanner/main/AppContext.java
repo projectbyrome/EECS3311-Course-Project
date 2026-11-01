@@ -8,11 +8,13 @@ import mealplanner.agent.PromptBuilder;
 import mealplanner.agent.ResponseParser;
 import mealplanner.agent.llm.ClaudeClient;
 import mealplanner.agent.llm.LLMClient;
+import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
 import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
+import mealplanner.cli.MacrosCommand;
 import mealplanner.cli.PantryCommand;
 import mealplanner.cli.ShoppingCommand;
 import mealplanner.data.DataAccessException;
@@ -22,6 +24,7 @@ import mealplanner.data.SeedLoader;
 import mealplanner.data.SqliteCalendarRepository;
 import mealplanner.data.SqliteChecklistRepository;
 import mealplanner.data.SqliteIngredientRepository;
+import mealplanner.data.SqliteNutritionCacheRepository;
 import mealplanner.data.SqlitePantryRepository;
 import mealplanner.data.SqliteRecipeRepository;
 import mealplanner.domain.Recipe;
@@ -29,14 +32,19 @@ import mealplanner.events.CalendarChanged;
 import mealplanner.events.ChecklistChanged;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
+import mealplanner.external.CachedNutritionSource;
+import mealplanner.external.NutritionSource;
+import mealplanner.external.UsdaFoodDataClient;
 import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
+import mealplanner.service.NutritionService;
 import mealplanner.service.PantryService;
 import mealplanner.service.RecipeLibraryService;
 import mealplanner.service.ShoppingDraftValidator;
 import mealplanner.service.ShoppingNeedsCalculator;
 import mealplanner.service.UnitConverter;
 import mealplanner.ui.ChecklistView;
+import mealplanner.ui.MacroGeneratorView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
 import mealplanner.ui.PantryView;
@@ -90,7 +98,8 @@ public class AppContext {
             PantryView pantryView = new PantryView(facade);
             eventBus.subscribe(PantryChanged.class, checklistView);
             eventBus.subscribe(PantryChanged.class, pantryView);
-            mainWindow = new MainWindow(calendarView, checklistView, pantryView);
+            MacroGeneratorView macroView = new MacroGeneratorView(facade);
+            mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView);
         }
         return mainWindow;
     }
@@ -103,16 +112,17 @@ public class AppContext {
             cliApp.register(new ChecklistCommand(facade, in, System.out));
             cliApp.register(new ShoppingCommand(facade, in, System.out));
             cliApp.register(new PantryCommand(facade, in, System.out));
+            cliApp.register(new MacrosCommand(facade, in, System.out));
         }
         return cliApp;
     }
 
     private void buildServices() {
         LLMClient llm = new ClaudeClient(config.anthropicApiKey, config.model, Duration.ofSeconds(30));
-        buildServices(llm);
+        buildServices(llm, new UsdaFoodDataClient(config.usdaApiKey));
     }
 
-    private void buildServices(LLMClient llm) {
+    private void buildServices(LLMClient llm, NutritionSource usda) {
         Database db = openDatabase();
         SeedLoader seedLoader = new SeedLoader();
         db.seedIfEmpty(seedLoader);
@@ -127,6 +137,8 @@ public class AppContext {
 
         PantryService pantryService = new PantryService(new SqlitePantryRepository(db), ingredientRepo,
                 converter, eventBus);
+        NutritionService nutritionService = new NutritionService(
+                new CachedNutritionSource(usda, new SqliteNutritionCacheRepository(db)), ingredientRepo, converter);
         RecipeLibraryService recipeLibraryService = new RecipeLibraryService(recipeRepo);
         mealCalendarService = new MealCalendarService(new SqliteCalendarRepository(db, recipeRepo),
                 recipeLibraryService, pantryService, eventBus);
@@ -136,9 +148,11 @@ public class AppContext {
         ShoppingListGenerator shoppingListGenerator = new ShoppingListGenerator(
                 new ShoppingNeedsCalculator(converter), recipeLibraryService, pantryService, llm,
                 promptBuilder, responseParser, new ShoppingDraftValidator(converter));
+        MacroGenerator macroGenerator = new MacroGenerator(nutritionService, recipeLibraryService, llm,
+                promptBuilder, responseParser);
 
         facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService,
-                shoppingListGenerator);
+                shoppingListGenerator, macroGenerator);
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

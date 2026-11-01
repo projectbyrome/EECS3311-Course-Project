@@ -2,15 +2,18 @@ package mealplanner.app;
 
 import java.time.LocalDate;
 import java.util.List;
+import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.domain.Checklist;
 import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.DayPlan;
 import mealplanner.domain.MealSlot;
+import mealplanner.domain.NutritionSummary;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
 import mealplanner.model.FinishResult;
+import mealplanner.model.NutritionSelection;
 import mealplanner.model.RecipeSelection;
 import mealplanner.model.ShoppingDraft;
 import mealplanner.service.ChecklistService;
@@ -29,15 +32,17 @@ public class AppFacade {
     private final PantryService pantryService;
     private final ChecklistService checklistService;
     private final ShoppingListGenerator shoppingListGenerator;
+    private final MacroGenerator macroGenerator;
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
                      PantryService pantryService, ChecklistService checklistService,
-                     ShoppingListGenerator shoppingListGenerator) {
+                     ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator) {
         this.mealCalendarService = mealCalendarService;
         this.recipeLibraryService = recipeLibraryService;
         this.pantryService = pantryService;
         this.checklistService = checklistService;
         this.shoppingListGenerator = shoppingListGenerator;
+        this.macroGenerator = macroGenerator;
     }
 
     // ---- F01 meal calendar ----
@@ -122,6 +127,13 @@ public class AppFacade {
 
     public void removePantryItem(long itemId) {
         pantryService.remove(itemId);
+    }
+
+    // ---- F05 macros ----
+
+    /** May call USDA and Claude, so the GUI runs it in a background task. */
+    public NutritionSummary generateMacros(List<NutritionSelection> selections) {
+        return macroGenerator.generate(selections);
     }
 
     // ---- F08 recipe library (only what the calendar needs to pick a recipe) ----

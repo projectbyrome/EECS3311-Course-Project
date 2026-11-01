@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 /**
  * The main window: a menu down the left side, and the chosen feature's screen on the right.
- * The ☰ button in the top bar hides and shows the menu. Theme decide how it look.
+ * The ☰ button in the top bar hides and shows the menu. Colours and fonts come from Theme.
  */
 public class MainWindow {
 
@@ -25,7 +25,8 @@ public class MainWindow {
     private final ToggleGroup group = new ToggleGroup();
     private final List<ToggleButton> buttons = new ArrayList<>();
 
-    public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView) {
+    public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView,
+                      MacroGeneratorView macroGeneratorView) {
         Button toggle = new Button("☰");
         toggle.getStyleClass().add("menu-toggle");
         toggle.setOnAction(e -> toggleMenu());
@@ -43,6 +44,7 @@ public class MainWindow {
         addPage("Meal Calendar", "Plan your meals for the week.", calendarView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
+        addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
 
         buttons.get(0).setSelected(true);
     }
