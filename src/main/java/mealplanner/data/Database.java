@@ -41,7 +41,8 @@ public class Database {
                         recipe_id INTEGER NOT NULL,
                         servings  REAL NOT NULL,
                         skipped   INTEGER NOT NULL DEFAULT 0,
-                        missing   INTEGER NOT NULL DEFAULT 0
+                        missing   INTEGER NOT NULL DEFAULT 0,
+                        notes     TEXT NOT NULL DEFAULT ''
                     )""");
             st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS checklist (
@@ -132,20 +133,25 @@ public class Database {
                         amount        REAL NOT NULL,
                         unit          TEXT NOT NULL
                     )""");
-            // F08: nutrition per serving of library recipes (JSON, like the catalogue). Added with ALTER TABLE
-            // so a database made by an earlier version gets the column too.
-            boolean hasNutrition = false;
-            try (ResultSet rs = st.executeQuery("PRAGMA table_info(recipe)")) {
-                while (rs.next()) {
-                    if (rs.getString("name").equals("nutrition")) hasNutrition = true;
-                }
-            }
-            if (!hasNutrition) {
-                st.executeUpdate("ALTER TABLE recipe ADD COLUMN nutrition TEXT");
-            }
+            // Columns added after the first version. ALTER TABLE gives a database made by an earlier
+            // version the new column too (CREATE TABLE IF NOT EXISTS skips a table that already exists).
+            addColumnIfMissing(st, "recipe", "nutrition", "TEXT");                  // F08: nutrition per serving
+            addColumnIfMissing(st, "meal_entry", "notes", "TEXT NOT NULL DEFAULT ''"); // F01: meal notes
         } catch (SQLException e) {
             throw new DataAccessException("Migration failed", e);
         }
+    }
+
+    private static void addColumnIfMissing(Statement st, String table, String column, String type)
+            throws SQLException {
+        try (ResultSet rs = st.executeQuery("PRAGMA table_info(" + table + ")")) {
+            while (rs.next()) {
+                if (rs.getString("name").equals(column)) {
+                    return; // already there
+                }
+            }
+        }
+        st.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + column + " " + type);
     }
 
     /** Path of the bundled list of known ingredients (on the classpath, or a file path). */

@@ -16,6 +16,11 @@ import mealplanner.domain.MealEntry;
 import mealplanner.domain.MealSlot;
 import mealplanner.domain.Recipe;
 
+/**
+ * SQLite implementation of CalendarRepository.
+ * Meal entries store only the recipe id; the Recipe object is loaded through RecipeRepository
+ * (archived recipes are still returned, so old meals keep working).
+ */
 public class SqliteCalendarRepository implements CalendarRepository {
 
     private final Database db;
@@ -73,7 +78,8 @@ public class SqliteCalendarRepository implements CalendarRepository {
 
     private void insertEntry(Connection c, String date, MealEntry e) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO meal_entry(date, slot, recipe_id, servings, skipped, missing) VALUES(?,?,?,?,?,?)",
+                "INSERT INTO meal_entry(date, slot, recipe_id, servings, skipped, missing, notes) "
+                        + "VALUES(?,?,?,?,?,?,?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, date);
             ps.setString(2, e.getSlot().name());
@@ -81,6 +87,7 @@ public class SqliteCalendarRepository implements CalendarRepository {
             ps.setDouble(4, e.getServings());
             ps.setInt(5, e.isSkipped() ? 1 : 0);
             ps.setInt(6, e.isMissingIngredients() ? 1 : 0);
+            ps.setString(7, e.getNotes());
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
@@ -92,10 +99,15 @@ public class SqliteCalendarRepository implements CalendarRepository {
 
     private void updateEntry(Connection c, MealEntry e) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "UPDATE meal_entry SET skipped = ?, missing = ? WHERE id = ?")) {
-            ps.setInt(1, e.isSkipped() ? 1 : 0);
-            ps.setInt(2, e.isMissingIngredients() ? 1 : 0);
-            ps.setLong(3, e.getId());
+                "UPDATE meal_entry SET slot = ?, recipe_id = ?, servings = ?, notes = ?, skipped = ?, missing = ? "
+                        + "WHERE id = ?")) {
+            ps.setString(1, e.getSlot().name());
+            ps.setLong(2, e.getRecipe().getId());
+            ps.setDouble(3, e.getServings());
+            ps.setString(4, e.getNotes());
+            ps.setInt(5, e.isSkipped() ? 1 : 0);
+            ps.setInt(6, e.isMissingIngredients() ? 1 : 0);
+            ps.setLong(7, e.getId());
             ps.executeUpdate();
         }
     }
@@ -138,7 +150,8 @@ public class SqliteCalendarRepository implements CalendarRepository {
 
     private void loadEntries(Connection c, DayPlan day) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT id, slot, recipe_id, servings, skipped, missing FROM meal_entry WHERE date = ? ORDER BY id")) {
+                "SELECT id, slot, recipe_id, servings, skipped, missing, notes FROM meal_entry "
+                        + "WHERE date = ? ORDER BY id")) {
             ps.setString(1, day.getDate().toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -146,7 +159,7 @@ public class SqliteCalendarRepository implements CalendarRepository {
                     Recipe recipe = recipes.findById(recipeId)
                             .orElseThrow(() -> new DataAccessException("Recipe " + recipeId + " not found", null));
                     MealEntry e = new MealEntry(MealSlot.valueOf(rs.getString("slot")), recipe,
-                            rs.getDouble("servings"));
+                            rs.getDouble("servings"), rs.getString("notes"));
                     e.setId(rs.getLong("id"));
                     if (rs.getInt("skipped") == 1) e.markSkipped();
                     e.setMissing(rs.getInt("missing") == 1);

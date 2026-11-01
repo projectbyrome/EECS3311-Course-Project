@@ -43,20 +43,32 @@ public class MealCalendarService implements EventListener {
 
     /** Seven days starting at weekStart; days with nothing saved come back empty. */
     public List<DayPlan> getWeek(LocalDate weekStart) {
-        LocalDate weekEnd = weekStart.plusDays(7);
-        Map<LocalDate, DayPlan> saved = calendarRepository.findDaysFrom(weekStart).stream()
-                .filter(d -> d.getDate().isBefore(weekEnd))
-                .collect(Collectors.toMap(DayPlan::getDate, Function.identity()));
-        List<DayPlan> week = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            LocalDate date = weekStart.plusDays(i);
-            week.add(saved.getOrDefault(date, new DayPlan(date)));
+        return getDays(weekStart, 7);
+    }
+
+    /** {@code count} days starting at {@code from} (used for the month view); empty days come back empty. */
+    public List<DayPlan> getDays(LocalDate from, int count) {
+        if (count <= 0) {
+            throw new InvalidInputException("count must be greater than 0");
         }
-        return week;
+        LocalDate end = from.plusDays(count);
+        Map<LocalDate, DayPlan> saved = calendarRepository.findDaysFrom(from).stream()
+                .filter(d -> d.getDate().isBefore(end))
+                .collect(Collectors.toMap(DayPlan::getDate, Function.identity()));
+        List<DayPlan> days = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            LocalDate date = from.plusDays(i);
+            days.add(saved.getOrDefault(date, new DayPlan(date)));
+        }
+        return days;
+    }
+
+    public DayPlan addMeal(LocalDate date, MealSlot slot, long recipeId, double servings) {
+        return addMeal(date, slot, recipeId, servings, "");
     }
 
     /** SD01: validates, flags the meal if the pantry is short, saves the day and publishes CalendarChanged. */
-    public DayPlan addMeal(LocalDate date, MealSlot slot, long recipeId, double servings) {
+    public DayPlan addMeal(LocalDate date, MealSlot slot, long recipeId, double servings, String notes) {
         if (servings <= 0) {
             throw new InvalidInputException("Servings must be greater than 0");
         }
@@ -65,9 +77,25 @@ public class MealCalendarService implements EventListener {
         if (day.isClosed() || date.isBefore(LocalDate.now())) {
             throw new InvalidInputException("Cannot add a meal to a day that has passed: " + date);
         }
-        MealEntry entry = new MealEntry(slot, recipe, servings);
+        MealEntry entry = new MealEntry(slot, recipe, servings, notes);
         entry.setMissing(!pantryService.missingFor(recipe, servings).isEmpty());
         day.addEntry(entry);
+        calendarRepository.save(day);
+        eventBus.publish(new CalendarChanged(date));
+        return day;
+    }
+
+    /** Meal details "Save": changes the slot, recipe, servings and notes of a planned meal. */
+    public DayPlan updateMeal(LocalDate date, long entryId, MealSlot slot, long recipeId, double servings,
+                              String notes) {
+        DayPlan day = requireDay(date);
+        if (day.isClosed() || date.isBefore(LocalDate.now())) {
+            throw new InvalidInputException("Cannot change a meal on a day that has passed: " + date);
+        }
+        Recipe recipe = recipeLibraryService.getById(recipeId);
+        MealEntry entry = day.findEntry(entryId);
+        entry.update(slot, recipe, servings, notes);
+        entry.setMissing(!pantryService.missingFor(recipe, servings).isEmpty());
         calendarRepository.save(day);
         eventBus.publish(new CalendarChanged(date));
         return day;

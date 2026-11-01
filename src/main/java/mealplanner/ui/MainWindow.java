@@ -42,14 +42,12 @@ public class MainWindow {
         root.setLeft(menu);
 
         addPage("Profile", "Your diet, allergies and favourite recipe categories.", profileView);
-        addPage("Meal Calendar", "Plan your meals for the week.", calendarView);
+        addPage("Meal Calendar", "Plan your meals for the month.", calendarView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
         addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
 
         buttons.get(1).setSelected(true); // open on the Meal Calendar, not the Profile
-
-        buttons.get(0).setSelected(true);
     }
 
     /** Hides the menu if it is showing, or shows it again if it is hidden. */

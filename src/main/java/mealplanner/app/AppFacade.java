@@ -57,8 +57,22 @@ public class AppFacade {
         return mealCalendarService.getWeek(weekStart);
     }
 
+    /** The days shown by the month view, starting at {@code from}. */
+    public List<DayPlan> getDays(LocalDate from, int count) {
+        return mealCalendarService.getDays(from, count);
+    }
+
     public DayPlan addMealToDay(LocalDate date, MealSlot slot, long recipeId, double servings) {
         return mealCalendarService.addMeal(date, slot, recipeId, servings);
+    }
+
+    public DayPlan addMealToDay(LocalDate date, MealSlot slot, long recipeId, double servings, String notes) {
+        return mealCalendarService.addMeal(date, slot, recipeId, servings, notes);
+    }
+
+    public DayPlan updateMeal(LocalDate date, long entryId, MealSlot slot, long recipeId, double servings,
+                              String notes) {
+        return mealCalendarService.updateMeal(date, entryId, slot, recipeId, servings, notes);
     }
 
     public void removeMeal(LocalDate date, long entryId) {
