@@ -176,7 +176,16 @@ public class Database {
                 ps.executeBatch();
             }
             c.commit();
-            // TODO (F07): load the recipe catalogue when its table is empty
+            boolean catalogEmpty;
+            try (Statement st = c.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM catalog_recipe")) {
+                catalogEmpty = rs.next() && rs.getLong(1) == 0;
+            }
+            if (catalogEmpty) {
+                new SqliteCatalogRepository(this).insertAll(c,
+                        loader.loadCatalog(CATALOG_JSON, new SqliteIngredientRepository(this)));
+                c.commit();
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Cannot load the bundled data", e);
         }

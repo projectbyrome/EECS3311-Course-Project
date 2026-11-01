@@ -41,11 +41,13 @@ public class MainWindow {
         menu.setPrefWidth(200);
         root.setLeft(menu);
 
+        addPage("Profile", "Your diet, allergies and favourite recipe categories.", profileView);
         addPage("Meal Calendar", "Plan your meals for the week.", calendarView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
         addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
-        addPage("Profile", "Your diet, allergies and favourite recipe categories.", profileView);
+
+        buttons.get(1).setSelected(true); // open on the Meal Calendar, not the Profile
 
         buttons.get(0).setSelected(true);
     }
