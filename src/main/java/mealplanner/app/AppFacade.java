@@ -193,9 +193,31 @@ public class AppFacade {
         return recipeCatalogService.categories();
     }
 
-    // ---- F08 recipe library (only what the calendar needs to pick a recipe) ----
+    // ---- F08 / F09 recipe library ----
 
     public List<Recipe> searchLibrary(String query) {
         return recipeLibraryService.search(query);
+    }
+
+    /** One recipe of the library, for the recipe form and "recipe show". */
+    public Recipe getRecipe(long recipeId) {
+        return recipeLibraryService.getById(recipeId);
+    }
+
+    /**
+     * SD03: checks, adds nutrition and warnings, and saves a new (id 0) or edited recipe.
+     * Throws InvalidRecipeException with the problem rows if nothing was saved. May call USDA.
+     */
+    public Recipe saveRecipe(Recipe recipe) {
+        return recipeLibraryService.save(recipe);
+    }
+
+    /** Archives the recipe: it leaves the library, but meals already in the calendar keep it. */
+    public void removeRecipe(long recipeId) {
+        recipeLibraryService.remove(recipeId);
+    }
+
+    public List<Recipe> getFavourites() {
+        return recipeLibraryService.favourites();
     }
 }

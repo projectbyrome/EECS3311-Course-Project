@@ -23,6 +23,7 @@ import mealplanner.cli.CliApp;
 import mealplanner.cli.MacrosCommand;
 import mealplanner.cli.PantryCommand;
 import mealplanner.cli.ProfileCommand;
+import mealplanner.cli.RecipeCommand;
 import mealplanner.cli.RecommendCommand;
 import mealplanner.cli.ShoppingCommand;
 import mealplanner.data.DataAccessException;
@@ -133,6 +134,7 @@ public class AppContext {
             cliApp.register(new MacrosCommand(facade, in, System.out));
             cliApp.register(new ProfileCommand(facade, in, System.out));
             cliApp.register(new RecommendCommand(facade, in, System.out));
+            cliApp.register(new RecipeCommand(facade, in, System.out));
         }
         return cliApp;
     }
@@ -162,8 +164,8 @@ public class AppContext {
         ProfileService profileService = new ProfileService(new SqliteProfileRepository(db), ingredientRepo, eventBus);
         RecipeCatalogService recipeCatalogService = new RecipeCatalogService(new SqliteCatalogRepository(db),
                 nutritionService);
-        RecipeLibraryService recipeLibraryService = new RecipeLibraryService(recipeRepo, recipeCatalogService,
-                profileService, eventBus);
+        RecipeLibraryService recipeLibraryService = new RecipeLibraryService(recipeRepo, ingredientRepo,
+                recipeCatalogService, nutritionService, profileService, eventBus);
         mealCalendarService = new MealCalendarService(new SqliteCalendarRepository(db, recipeRepo),
                 recipeLibraryService, pantryService, eventBus);
         ChecklistService checklistService = new ChecklistService(new SqliteChecklistRepository(db),
@@ -174,6 +176,8 @@ public class AppContext {
                 promptBuilder, responseParser, new ShoppingDraftValidator(converter));
         MacroGenerator macroGenerator = new MacroGenerator(nutritionService, recipeLibraryService, llm,
                 promptBuilder, responseParser);
+        // F08: saving a recipe matches its ingredients to USDA foods like the Macro Generator (SD03 -> SD05).
+        recipeLibraryService.setFoodMatcher(macroGenerator);
 
         ToolManager toolManager = new ToolManager();
         registerTools(toolManager, profileService, recipeLibraryService, recipeCatalogService);
