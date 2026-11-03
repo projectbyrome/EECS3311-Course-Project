@@ -3,6 +3,7 @@ package mealplanner.app;
 import java.time.LocalDate;
 import java.util.List;
 import mealplanner.agent.workflows.MacroGenerator;
+import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.domain.Checklist;
 import mealplanner.domain.ChecklistItem;
@@ -17,10 +18,13 @@ import mealplanner.domain.ValidationReport;
 import mealplanner.model.FinishResult;
 import mealplanner.model.NutritionSelection;
 import mealplanner.model.RecipeSelection;
+import mealplanner.model.RecommendationFilter;
+import mealplanner.model.RecommendationResult;
 import mealplanner.model.ShoppingDraft;
 import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
 import mealplanner.service.PantryService;
+import mealplanner.service.RecipeCatalogService;
 import mealplanner.service.ProfileService;
 import mealplanner.service.RecipeLibraryService;
 
@@ -37,11 +41,14 @@ public class AppFacade {
     private final ShoppingListGenerator shoppingListGenerator;
     private final MacroGenerator macroGenerator;
     private final ProfileService profileService;
+    private final RecipeRecommender recipeRecommender;
+    private final RecipeCatalogService recipeCatalogService;
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
                      PantryService pantryService, ChecklistService checklistService,
                      ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator,
-                     ProfileService profileService) {
+                     ProfileService profileService, RecipeRecommender recipeRecommender,
+                     RecipeCatalogService recipeCatalogService) {
         this.mealCalendarService = mealCalendarService;
         this.recipeLibraryService = recipeLibraryService;
         this.pantryService = pantryService;
@@ -49,6 +56,8 @@ public class AppFacade {
         this.shoppingListGenerator = shoppingListGenerator;
         this.macroGenerator = macroGenerator;
         this.profileService = profileService;
+        this.recipeRecommender = recipeRecommender;
+        this.recipeCatalogService = recipeCatalogService;
     }
 
     // ---- F01 meal calendar ----
@@ -165,6 +174,23 @@ public class AppFacade {
     /** Saves nothing and returns the problems if a value is invalid (UC06 3a). */
     public ValidationReport updateProfile(UserProfile profile) {
         return profileService.update(profile);
+    }
+
+    // ---- F07 recommendations ----
+
+    /** May call Claude several times, so the GUI runs it in a background task. */
+    public RecommendationResult recommendRecipes(RecommendationFilter filter) {
+        return recipeRecommender.recommend(filter);
+    }
+
+    /** Adds the approved catalogue recipe to the recipe library and returns the library copy. */
+    public Recipe approveRecommendation(long catalogId) {
+        return recipeLibraryService.importFromCatalog(catalogId);
+    }
+
+    /** Every category name used in the catalogue, A to Z, for the filter form. */
+    public List<String> catalogCategories() {
+        return recipeCatalogService.categories();
     }
 
     // ---- F08 recipe library (only what the calendar needs to pick a recipe) ----

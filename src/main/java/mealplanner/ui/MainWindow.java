@@ -26,7 +26,8 @@ public class MainWindow {
     private final List<ToggleButton> buttons = new ArrayList<>();
 
     public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView,
-                      MacroGeneratorView macroGeneratorView, ProfileView profileView) {
+                      MacroGeneratorView macroGeneratorView, ProfileView profileView,
+                      RecommendationView recommendationView) {
         Button toggle = new Button("☰");
         toggle.getStyleClass().add("menu-toggle");
         toggle.setOnAction(e -> toggleMenu());
@@ -46,6 +47,7 @@ public class MainWindow {
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
         addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
+        addPage("Recommendations", "Recipe ideas from the catalogue that fit your profile.", recommendationView);
 
         buttons.get(1).setSelected(true); // open on the Meal Calendar, not the Profile
     }
