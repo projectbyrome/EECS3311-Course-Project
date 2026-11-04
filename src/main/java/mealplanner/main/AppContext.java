@@ -65,6 +65,7 @@ import mealplanner.ui.ChecklistView;
 import mealplanner.ui.MacroGeneratorView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
+import mealplanner.ui.NutritionSummaryView;
 import mealplanner.ui.PantryView;
 import mealplanner.ui.ProfileView;
 import mealplanner.ui.RecipeLibraryView;
@@ -72,7 +73,7 @@ import mealplanner.ui.RecommendationView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
- * subscriptions and registers the CLI commands
+ * subscriptions and registers the CLI commands. Nothing else in the program creates services.
  */
 public class AppContext {
 
@@ -125,8 +126,18 @@ public class AppContext {
             RecipeLibraryView libraryView = new RecipeLibraryView(facade);
             // Observer: saved, removed, imported or re-warned recipes redraw the library list.
             eventBus.subscribe(LibraryChanged.class, libraryView);
+            NutritionSummaryView summaryView = new NutritionSummaryView(facade);
+            // F10: the calendar's "Nutrition" buttons open the summary under the week (UC10 trigger).
+            calendarView.setSummaryHandlers(summaryView::onShowDay, summaryView::onShowWeek);
+            // The Profile's Daily goals card opens the same summary, and shows goals saved elsewhere.
+            profileView.setSummaryHandlers(summaryView::onShowDay, summaryView::onShowWeek);
+            eventBus.subscribe(ProfileChanged.class, profileView);
+            // Observer: new goals, a changed day or an edited recipe redraw the summary shown.
+            eventBus.subscribe(ProfileChanged.class, summaryView);
+            eventBus.subscribe(CalendarChanged.class, summaryView);
+            eventBus.subscribe(LibraryChanged.class, summaryView);
             mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, libraryView,
-                    profileView, recommendationView);
+                    profileView, recommendationView, summaryView);
         }
         return mainWindow;
     }

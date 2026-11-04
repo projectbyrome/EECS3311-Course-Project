@@ -9,6 +9,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -54,8 +55,6 @@ import mealplanner.events.EventListener;
  * F01 GUI: a month of meals. Each day shows one dot per meal slot (coloured when something is planned).
  * Clicking a day lists its meals underneath; clicking a meal fills the Meal details box on the right,
  * where it can be changed, skipped or removed. The same box adds a new meal to the chosen day.
- *
- * The calendar draws its own colours (Text, Circle and plain boxes), so Theme leaves them alone.
  */
 public class MealCalendarView extends HBox implements EventListener {
 
@@ -95,6 +94,11 @@ public class MealCalendarView extends HBox implements EventListener {
     private final Button saveButton = new Button("Save");
     private final Button skipButton = new Button("Skip");
     private final Button removeButton = new Button("Remove meal");
+    // F10: open the Nutrition Summary for the chosen day or its week (set by AppContext)
+    private final Button dayNutritionButton = new Button("Day nutrition");
+    private final Button weekNutritionButton = new Button("Week nutrition");
+    private Consumer<LocalDate> daySummaryHandler;
+    private Consumer<LocalDate> weekSummaryHandler;
     private final Label pastNote = new Label("This day has passed, so its meals can't be changed.");
 
     private YearMonth month = YearMonth.now();
@@ -114,6 +118,17 @@ public class MealCalendarView extends HBox implements EventListener {
         showNewMeal();
     }
 
+    /**
+     * F10 (UC10 trigger): the Nutrition Summary is opened from the calendar, for the chosen day or its week
+     * (Monday to Sunday). The calendar only knows these two handlers, not the summary view itself.
+     */
+    public void setSummaryHandlers(Consumer<LocalDate> forDay, Consumer<LocalDate> forWeek) {
+        this.daySummaryHandler = forDay;
+        this.weekSummaryHandler = forWeek;
+        dayNutritionButton.setVisible(forDay != null);
+        weekNutritionButton.setVisible(forWeek != null);
+    }
+
     // ---------------------------------------------------------------- building the three cards
 
     private VBox monthCard() {
@@ -131,7 +146,8 @@ public class MealCalendarView extends HBox implements EventListener {
         today.setOnAction(e -> onSelectDay(LocalDate.now()));
         Region gap = new Region();
         HBox.setHgrow(gap, Priority.ALWAYS);
-        HBox header = new HBox(6, titles, gap, prev, next, today);
+        // F10: the nutrition buttons sit in the top right corner, beside the month buttons
+        HBox header = new HBox(6, titles, gap, dayNutritionButton, weekNutritionButton, prev, next, today);
         header.setAlignment(Pos.TOP_LEFT);
 
         monthGrid.setHgap(6);
@@ -163,10 +179,16 @@ public class MealCalendarView extends HBox implements EventListener {
         dayTitle.getStyleClass().add("section-title");
         dayCount.getStyleClass().add("description");
         VBox titles = new VBox(3, dayTitle, dayCount);
+        dayNutritionButton.setOnAction(e -> { if (daySummaryHandler != null) daySummaryHandler.accept(selectedDay); });
+        weekNutritionButton.setOnAction(e -> { if (weekSummaryHandler != null) weekSummaryHandler.accept(
+                selectedDay.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))); });
+        dayNutritionButton.setVisible(false); // shown once AppContext sets the handlers
+        weekNutritionButton.setVisible(false);
         mealList.setBackground(fill(Theme.CARD, 10));
         mealList.setBorder(line(Theme.BORDER, 10));
         ScrollPane scroll = new ScrollPane(mealList);
         scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true); // the list fills the box, so a day with one meal has no light area under it
         VBox.setVgrow(scroll, Priority.ALWAYS);
 
         VBox card = section(10);

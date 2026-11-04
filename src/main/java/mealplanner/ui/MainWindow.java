@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 /**
  * The main window: a menu down the left side, and the chosen feature's screen on the right.
+ * The ☰ button in the top bar hides and shows the menu.
  */
 public class MainWindow {
 
@@ -23,10 +24,12 @@ public class MainWindow {
     private final VBox menu = new VBox();
     private final ToggleGroup group = new ToggleGroup();
     private final List<ToggleButton> buttons = new ArrayList<>();
+    /** F10: the Nutrition Summary window, made the first time it is opened. */
+    private Stage summaryStage;
 
     public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView,
                       MacroGeneratorView macroGeneratorView, RecipeLibraryView recipeLibraryView, ProfileView profileView,
-                      RecommendationView recommendationView) {
+                      RecommendationView recommendationView, NutritionSummaryView nutritionSummaryView) {
         Button toggle = new Button("☰");
         toggle.getStyleClass().add("menu-toggle");
         toggle.setOnAction(e -> toggleMenu());
@@ -42,7 +45,8 @@ public class MainWindow {
         root.setLeft(menu);
 
         addPage("Profile", "Your diet, allergies and favourite recipe categories.", profileView);
-        addPage("Meal Calendar", "Plan your meals for the month.", calendarView);
+        addPage("Meal Calendar", "Plan your meals for the month, and see their nutrition.", calendarView);
+        connectSummaryWindow(nutritionSummaryView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
         addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
@@ -50,6 +54,34 @@ public class MainWindow {
         addPage("Recommendations", "Recipe ideas from the catalogue that fit your profile.", recommendationView);
 
         buttons.get(1).setSelected(true); // open on the Meal Calendar, not the Profile
+    }
+
+    /**
+     * F10: the Nutrition Summary opens in its own window next to the main one, so the month calendar keeps
+     * its full size. "Day nutrition" / "Week nutrition" in the calendar open it; its Close button hides it.
+     */
+    private void connectSummaryWindow(NutritionSummaryView summaryView) {
+        summaryView.setOpenCloseHandlers(() -> {
+            if (summaryStage == null) {
+                Label heading = new Label("Nutrition Summary");
+                heading.getStyleClass().add("page-title");
+                Label subtitle = new Label("Your planned meals compared with your daily goals.");
+                subtitle.getStyleClass().add("description");
+                VBox header = new VBox(4, heading, subtitle);
+                header.getStyleClass().add("page-header");
+                BorderPane page = new BorderPane(summaryView);
+                page.setTop(header);
+                page.getStyleClass().add("page");
+                summaryStage = new Stage();
+                summaryStage.initOwner(root.getScene().getWindow());
+                summaryStage.setTitle("Nutrition Summary");
+                summaryStage.setScene(new Scene(page, 1000, 620));
+            }
+            summaryStage.show();
+            summaryStage.toFront();
+        }, () -> {
+            if (summaryStage != null) summaryStage.hide();
+        });
     }
 
     /** Hides the menu if it is showing, or shows it again if it is hidden. */
