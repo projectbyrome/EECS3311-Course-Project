@@ -220,4 +220,9 @@ public class AppFacade {
     public List<Recipe> getFavourites() {
         return recipeLibraryService.favourites();
     }
+
+    /** F09: returns the new favourite status. */
+    public boolean toggleFavourite(long recipeId) {
+        return recipeLibraryService.toggleFavourite(recipeId);
+    }
 }

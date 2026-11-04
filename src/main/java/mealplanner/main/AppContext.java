@@ -20,6 +20,7 @@ import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
 import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
+import mealplanner.cli.FavCommand;
 import mealplanner.cli.MacrosCommand;
 import mealplanner.cli.PantryCommand;
 import mealplanner.cli.ProfileCommand;
@@ -42,6 +43,7 @@ import mealplanner.domain.Recipe;
 import mealplanner.events.CalendarChanged;
 import mealplanner.events.ChecklistChanged;
 import mealplanner.events.EventBus;
+import mealplanner.events.LibraryChanged;
 import mealplanner.events.PantryChanged;
 import mealplanner.events.ProfileChanged;
 import mealplanner.external.CachedNutritionSource;
@@ -63,11 +65,12 @@ import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
 import mealplanner.ui.PantryView;
 import mealplanner.ui.ProfileView;
+import mealplanner.ui.RecipeLibraryView;
 import mealplanner.ui.RecommendationView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
- * subscriptions and registers the CLI commands. Nothing else in the program creates services.
+ * subscriptions and registers the CLI commands.
  */
 public class AppContext {
 
@@ -117,8 +120,11 @@ public class AppContext {
             MacroGeneratorView macroView = new MacroGeneratorView(facade);
             ProfileView profileView = new ProfileView(facade);
             RecommendationView recommendationView = new RecommendationView(facade);
-            mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, profileView,
-                    recommendationView);
+            RecipeLibraryView libraryView = new RecipeLibraryView(facade);
+            // Observer: saved, removed, imported or re-warned recipes redraw the library list.
+            eventBus.subscribe(LibraryChanged.class, libraryView);
+            mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, libraryView,
+                    profileView, recommendationView);
         }
         return mainWindow;
     }
@@ -135,6 +141,7 @@ public class AppContext {
             cliApp.register(new ProfileCommand(facade, in, System.out));
             cliApp.register(new RecommendCommand(facade, in, System.out));
             cliApp.register(new RecipeCommand(facade, in, System.out));
+            cliApp.register(new FavCommand(facade, in, System.out));
         }
         return cliApp;
     }

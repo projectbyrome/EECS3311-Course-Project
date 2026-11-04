@@ -204,6 +204,18 @@ public class MealCalendarView extends HBox implements EventListener {
         recipeBox.setPromptText("Choose a recipe from your library");
         recipeBox.setMaxWidth(Double.MAX_VALUE);
         recipeBox.setOnShowing(e -> reloadRecipes()); // recipes added since are in the list
+        // F09: favourites are marked with a heart (reloadRecipes puts them first)
+        recipeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Recipe r) {
+                return r == null ? "" : (r.isFavourite() ? "\u2665 " : "") + r.getName();
+            }
+
+            @Override
+            public Recipe fromString(String text) {
+                return null; // the box is not editable, so this is never used
+            }
+        });
 
         servingsLabel.setMinWidth(90);
         lessButton.setOnAction(e -> changeServings(-0.5));
@@ -535,7 +547,10 @@ public class MealCalendarView extends HBox implements EventListener {
 
     private void reloadRecipes() {
         Recipe chosen = recipeBox.getValue();
-        recipeBox.getItems().setAll(facade.searchLibrary(""));
+        // F09: favourites first
+        recipeBox.getItems().setAll(facade.searchLibrary("").stream()
+                .sorted(Comparator.comparing((Recipe r) -> !r.isFavourite()))
+                .toList());
         recipeBox.setValue(chosen);
     }
 
