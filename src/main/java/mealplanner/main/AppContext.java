@@ -13,6 +13,7 @@ import mealplanner.agent.tools.GetProfileTool;
 import mealplanner.agent.tools.SearchCatalogTool;
 import mealplanner.agent.tools.SearchLibraryTool;
 import mealplanner.agent.tools.ToolManager;
+import mealplanner.agent.workflows.DaySummaryWriter;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
@@ -27,6 +28,7 @@ import mealplanner.cli.ProfileCommand;
 import mealplanner.cli.RecipeCommand;
 import mealplanner.cli.RecommendCommand;
 import mealplanner.cli.ShoppingCommand;
+import mealplanner.cli.SummaryCommand;
 import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
 import mealplanner.data.RecipeRepository;
@@ -70,7 +72,7 @@ import mealplanner.ui.RecommendationView;
 
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
- * subscriptions and registers the CLI commands.
+ * subscriptions and registers the CLI commands
  */
 public class AppContext {
 
@@ -142,6 +144,7 @@ public class AppContext {
             cliApp.register(new RecommendCommand(facade, in, System.out));
             cliApp.register(new RecipeCommand(facade, in, System.out));
             cliApp.register(new FavCommand(facade, in, System.out));
+            cliApp.register(new SummaryCommand(facade, in, System.out));
         }
         return cliApp;
     }
@@ -192,8 +195,11 @@ public class AppContext {
         RecipeRecommender recipeRecommender = new RecipeRecommender(agentController, recipeCatalogService,
                 recipeLibraryService, profileService, responseParser);
 
+        DaySummaryWriter daySummaryWriter = new DaySummaryWriter(llm, promptBuilder);
+
         facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService,
-                shoppingListGenerator, macroGenerator, profileService, recipeRecommender, recipeCatalogService);
+                shoppingListGenerator, macroGenerator, profileService, recipeRecommender, recipeCatalogService,
+                nutritionService, daySummaryWriter);
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

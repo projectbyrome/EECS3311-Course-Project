@@ -1,20 +1,27 @@
 package mealplanner.app;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import mealplanner.agent.workflows.DaySummaryWriter;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.domain.Checklist;
 import mealplanner.domain.ChecklistItem;
 import mealplanner.domain.DayPlan;
+import mealplanner.domain.Ingredient;
+import mealplanner.domain.MealEntry;
 import mealplanner.domain.MealSlot;
+import mealplanner.domain.NutritionGoal;
 import mealplanner.domain.NutritionSummary;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
+import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.UserProfile;
 import mealplanner.domain.ValidationReport;
+import mealplanner.model.DaySummary;
 import mealplanner.model.FinishResult;
 import mealplanner.model.NutritionSelection;
 import mealplanner.model.RecipeSelection;
@@ -23,6 +30,7 @@ import mealplanner.model.RecommendationResult;
 import mealplanner.model.ShoppingDraft;
 import mealplanner.service.ChecklistService;
 import mealplanner.service.MealCalendarService;
+import mealplanner.service.NutritionService;
 import mealplanner.service.PantryService;
 import mealplanner.service.RecipeCatalogService;
 import mealplanner.service.ProfileService;
@@ -43,12 +51,15 @@ public class AppFacade {
     private final ProfileService profileService;
     private final RecipeRecommender recipeRecommender;
     private final RecipeCatalogService recipeCatalogService;
+    private final NutritionService nutritionService;
+    private final DaySummaryWriter daySummaryWriter;
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
                      PantryService pantryService, ChecklistService checklistService,
                      ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator,
                      ProfileService profileService, RecipeRecommender recipeRecommender,
-                     RecipeCatalogService recipeCatalogService) {
+                     RecipeCatalogService recipeCatalogService, NutritionService nutritionService,
+                     DaySummaryWriter daySummaryWriter) {
         this.mealCalendarService = mealCalendarService;
         this.recipeLibraryService = recipeLibraryService;
         this.pantryService = pantryService;
@@ -58,6 +69,8 @@ public class AppFacade {
         this.profileService = profileService;
         this.recipeRecommender = recipeRecommender;
         this.recipeCatalogService = recipeCatalogService;
+        this.nutritionService = nutritionService;
+        this.daySummaryWriter = daySummaryWriter;
     }
 
     // ---- F01 meal calendar ----
@@ -224,5 +237,75 @@ public class AppFacade {
     /** F09: returns the new favourite status. */
     public boolean toggleFavourite(long recipeId) {
         return recipeLibraryService.toggleFavourite(recipeId);
+    }
+
+    // ---- F10 nutrition summary ----
+
+    /**
+     * SD07: the day's meals -> totals ("incomplete" if data is missing) -> compared with the daily goal ->
+     * a short summary from Claude, or from a template if Claude is unavailable. May call USDA and Claude,
+     * so the GUI runs it in a background task.
+     */
+    public DaySummary daySummary(LocalDate date) {
+        DayPlan day = mealCalendarService.getDay(date);
+        NutritionGoal goal = profileService.getProfile().getDefaultGoal();
+        if (day.activeEntries().isEmpty()) {
+            return DaySummary.noMeals(date, goal); // 1a
+        }
+        List<String> notes = matchFoods(List.of(day));
+        List<String> meals = new ArrayList<>();
+        for (MealEntry entry : day.activeEntries()) {
+            NutritionSummary n = nutritionService.mealNutrition(entry);
+            meals.add(String.format("%s: %s x%s (%.0f kcal%s)", entry.getSlot(), entry.getRecipe().getName(),
+                    entry.getServings(), n.getCalories(),
+                    n.isComplete() ? "" : ", incomplete"));
+        }
+        NutritionSummary totals = nutritionService.dayTotals(day);
+        for (String note : notes) {
+            totals = totals.withNote(note);
+        }
+        boolean goalMet = goal.isMet(totals, NutritionGoal.DAILY_TOLERANCE_PCT);
+        List<String> misses = goal.misses(totals, NutritionGoal.DAILY_TOLERANCE_PCT);
+        String text = daySummaryWriter.write(totals, goal);
+        return new DaySummary(date, meals, totals, goal, goalMet, misses, text);
+    }
+
+    /** The seven days from weekStart added up (no Claude call). May call USDA. */
+    public NutritionSummary weekSummary(LocalDate weekStart) {
+        List<DayPlan> week = mealCalendarService.getWeek(weekStart);
+        List<String> notes = matchFoods(week);
+        NutritionSummary totals = nutritionService.weekTotals(week);
+        for (String note : notes) {
+            totals = totals.withNote(note);
+        }
+        return totals;
+    }
+
+    /** UC10 5a: values of 0 or less are rejected and nothing is saved; valid goals publish ProfileChanged. */
+    public ValidationReport updateGoal(NutritionGoal goal) {
+        return profileService.updateGoal(goal);
+    }
+
+    /**
+     * "Calculate Nutrition" as in SD05: ingredients of planned recipes that have no saved nutrition and no
+     * USDA food yet are matched first (Claude picks between candidates), so the totals can include them.
+     */
+    private List<String> matchFoods(List<DayPlan> days) {
+        if (macroGenerator == null) {
+            return List.of();
+        }
+        List<Ingredient> unmatched = new ArrayList<>();
+        for (DayPlan day : days) {
+            for (MealEntry entry : day.activeEntries()) {
+                NutritionSummary saved = entry.getRecipe().getNutritionPerServing();
+                if (saved != null && saved.isComplete()) continue;
+                for (RecipeIngredient ri : entry.getRecipe().ingredients()) {
+                    if (nutritionService.findFoodId(ri.getIngredient()).isEmpty()) {
+                        unmatched.add(ri.getIngredient());
+                    }
+                }
+            }
+        }
+        return unmatched.isEmpty() ? List.of() : macroGenerator.matchFoods(unmatched);
     }
 }
