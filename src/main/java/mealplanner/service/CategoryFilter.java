@@ -1,8 +1,13 @@
 package mealplanner.service;
 
+import mealplanner.domain.CategoryGroup;
 import mealplanner.domain.Recipe;
+import mealplanner.domain.RecipeCategory;
 
-/** The recipe has the category asked for, in any group ("Soup", "Spicy", "Poultry"), ignoring case. */
+/**
+ * The recipe has the category asked for ("Soup", "Curry", "Poultry"), ignoring case.
+ * Flavor categories are mainly use as a description
+ */
 public class CategoryFilter implements RecipeFilter {
 
     private final String category;
@@ -13,7 +18,12 @@ public class CategoryFilter implements RecipeFilter {
 
     @Override
     public boolean matches(Recipe recipe) {
-        return recipe.hasCategory(category);
+        for (RecipeCategory c : recipe.getCategories()) {
+            if (c.getGroup() != CategoryGroup.FLAVOR && c.getName().equalsIgnoreCase(category)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

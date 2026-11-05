@@ -38,7 +38,7 @@ import mealplanner.service.RecipeLibraryService;
 
 /**
  * Facade: the one entry point used by both the GUI views and the CLI commands.
- * One group of methods per feature.
+ * One group of methods per feature, F01 to F10.
  */
 public class AppFacade {
 
@@ -53,6 +53,24 @@ public class AppFacade {
     private final RecipeCatalogService recipeCatalogService;
     private final NutritionService nutritionService;
     private final DaySummaryWriter daySummaryWriter;
+
+    /** F01-F05 only (used by the earlier tests); profile and recommendation calls then fail. */
+    public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
+                     PantryService pantryService, ChecklistService checklistService,
+                     ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator) {
+        this(mealCalendarService, recipeLibraryService, pantryService, checklistService, shoppingListGenerator,
+                macroGenerator, null, null, null);
+    }
+
+    /** F01-F09 (used by the earlier tests); the F10 summary calls then fail. */
+    public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
+                     PantryService pantryService, ChecklistService checklistService,
+                     ShoppingListGenerator shoppingListGenerator, MacroGenerator macroGenerator,
+                     ProfileService profileService, RecipeRecommender recipeRecommender,
+                     RecipeCatalogService recipeCatalogService) {
+        this(mealCalendarService, recipeLibraryService, pantryService, checklistService, shoppingListGenerator,
+                macroGenerator, profileService, recipeRecommender, recipeCatalogService, null, null);
+    }
 
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
                      PantryService pantryService, ChecklistService checklistService,
@@ -307,5 +325,10 @@ public class AppFacade {
             }
         }
         return unmatched.isEmpty() ? List.of() : macroGenerator.matchFoods(unmatched);
+    }
+
+    /** F07 extra: adds a recipe Claude wrote (not from the catalogue) to the library and returns the saved copy. */
+    public Recipe approveWrittenRecipe(Recipe recipe) {
+        return recipeRecommender.addWritten(recipe);
     }
 }

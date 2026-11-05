@@ -1,5 +1,6 @@
 package mealplanner.main;
 
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -29,8 +30,8 @@ import mealplanner.cli.RecipeCommand;
 import mealplanner.cli.RecommendCommand;
 import mealplanner.cli.ShoppingCommand;
 import mealplanner.cli.SummaryCommand;
-import mealplanner.data.DataAccessException;
 import mealplanner.data.Database;
+import mealplanner.data.DataAccessException;
 import mealplanner.data.RecipeRepository;
 import mealplanner.data.SeedLoader;
 import mealplanner.data.SqliteCalendarRepository;
@@ -61,6 +62,7 @@ import mealplanner.service.RecipeLibraryService;
 import mealplanner.service.ShoppingDraftValidator;
 import mealplanner.service.ShoppingNeedsCalculator;
 import mealplanner.service.UnitConverter;
+import mealplanner.service.WrittenRecipeConverter;
 import mealplanner.ui.ChecklistView;
 import mealplanner.ui.MacroGeneratorView;
 import mealplanner.ui.MainWindow;
@@ -74,10 +76,11 @@ import mealplanner.ui.RecommendationView;
 /**
  * Composition root (CD10): reads the settings, builds every object once, wires the Observer
  * subscriptions and registers the CLI commands. Nothing else in the program creates services.
+ * Built for F01-F10.
  */
 public class AppContext {
 
-    /** Starter recipes for a new, empty library. */
+    /** Starter recipes for a new, empty library (their nutrition is worked out the first time they are edited). */
     static final String SAMPLE_RECIPES_JSON = "/data/sample-recipes.json";
 
     private final AppConfig config;
@@ -99,6 +102,13 @@ public class AppContext {
         return context;
     }
 
+    /** Same as create(), but with a different LLM client and nutrition source (used by tests). */
+    public static AppContext create(AppConfig config, UiMode mode, LLMClient llm, NutritionSource nutrition) {
+        AppContext context = new AppContext(config, mode);
+        context.buildServices(llm, nutrition);
+        return context;
+    }
+
     public AppFacade facade() {
         return facade;
     }
@@ -115,12 +125,12 @@ public class AppContext {
         if (mainWindow == null) {
             MealCalendarView calendarView = new MealCalendarView(facade);
             ChecklistView checklistView = new ChecklistView(facade);
+            PantryView pantryView = new PantryView(facade);
+            MacroGeneratorView macroView = new MacroGeneratorView(facade);
             eventBus.subscribe(CalendarChanged.class, calendarView);
             eventBus.subscribe(ChecklistChanged.class, checklistView);
-            PantryView pantryView = new PantryView(facade);
             eventBus.subscribe(PantryChanged.class, checklistView);
             eventBus.subscribe(PantryChanged.class, pantryView);
-            MacroGeneratorView macroView = new MacroGeneratorView(facade);
             ProfileView profileView = new ProfileView(facade);
             RecommendationView recommendationView = new RecommendationView(facade);
             RecipeLibraryView libraryView = new RecipeLibraryView(facade);
@@ -146,18 +156,16 @@ public class AppContext {
         if (cliApp == null) {
             Scanner in = new Scanner(System.in);
             cliApp = new CliApp(in, System.out);
-            cliApp.register(new CalendarCommand(facade, in, System.out));
-            cliApp.register(new ChecklistCommand(facade, in, System.out));
-            cliApp.register(new ShoppingCommand(facade, in, System.out));
-            cliApp.register(new PantryCommand(facade, in, System.out));
-            cliApp.register(new MacrosCommand(facade, in, System.out));
-            cliApp.register(new ProfileCommand(facade, in, System.out));
-            cliApp.register(new RecommendCommand(facade, in, System.out));
-            cliApp.register(new RecipeCommand(facade, in, System.out));
-            cliApp.register(new FavCommand(facade, in, System.out));
-            cliApp.register(new SummaryCommand(facade, in, System.out));
+            registerCommands(cliApp, in, System.out);
         }
         return cliApp;
+    }
+
+    /** For tests: a CLI that reads and writes the given streams. */
+    public CliApp cliApp(Scanner in, PrintStream out) {
+        CliApp cli = new CliApp(in, out);
+        registerCommands(cli, in, out);
+        return cli;
     }
 
     private void buildServices() {
@@ -204,7 +212,7 @@ public class AppContext {
         registerTools(toolManager, profileService, recipeLibraryService, recipeCatalogService);
         AgentController agentController = new AgentController(llm, toolManager, promptBuilder);
         RecipeRecommender recipeRecommender = new RecipeRecommender(agentController, recipeCatalogService,
-                recipeLibraryService, profileService, responseParser);
+                recipeLibraryService, profileService, responseParser, new WrittenRecipeConverter(ingredientRepo));
 
         DaySummaryWriter daySummaryWriter = new DaySummaryWriter(llm, promptBuilder);
 
@@ -227,12 +235,25 @@ public class AppContext {
         manager.register(new SearchCatalogTool(recipeCatalogService, profileService));
     }
 
+    private void registerCommands(CliApp cli, Scanner in, PrintStream out) {
+        cli.register(new CalendarCommand(facade, in, out));
+        cli.register(new ChecklistCommand(facade, in, out));
+        cli.register(new ShoppingCommand(facade, in, out));
+        cli.register(new PantryCommand(facade, in, out));
+        cli.register(new MacrosCommand(facade, in, out));
+        cli.register(new ProfileCommand(facade, in, out));
+        cli.register(new RecommendCommand(facade, in, out));
+        cli.register(new RecipeCommand(facade, in, out));
+        cli.register(new FavCommand(facade, in, out));
+        cli.register(new SummaryCommand(facade, in, out));
+    }
+
     private Database openDatabase() {
         try {
             Path parent = Path.of(config.dbPath).toAbsolutePath().getParent();
             if (parent != null) Files.createDirectories(parent);
         } catch (java.io.IOException e) {
-            throw new DataAccessException("Cannot create the folder for " + config.dbPath, e);
+            throw new DataAccessException("Cannot create the folder for "+ config.dbPath, e);
         }
         Database db = new Database(config.dbPath);
         db.migrate();

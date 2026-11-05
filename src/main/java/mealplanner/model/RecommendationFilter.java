@@ -8,11 +8,10 @@ import mealplanner.domain.NutritionGoal;
  */
 public class RecommendationFilter {
 
-    /** A category name from any group, e.g. "Soup", "Spicy" or "Poultry". */
     public String category;
     public Integer maxCookMinutes;
-    /** A daily goal; NutritionGoalFilter uses about a third of it for one meal. */
     public NutritionGoal goal;
+    public String request;
 
     public RecommendationFilter() {
     }
@@ -26,6 +25,11 @@ public class RecommendationFilter {
     public String describe() {
         return (category == null || category.isBlank() ? "any category" : "category " + category)
                 + ", " + (maxCookMinutes == null ? "any cooking time" : "at most " + maxCookMinutes + " min")
-                + ", " + (goal == null || goal.isEmpty() ? "no nutrition goal" : "daily goal " + goal);
+                + ", " + (goal == null || goal.isEmpty() ? "no nutrition goal" : "daily goal " + goal)
+                + (hasRequest() ? ", request \"" + request.trim() + "\"" : "");
+    }
+
+    public boolean hasRequest() {
+        return request != null && !request.isBlank();
     }
 }

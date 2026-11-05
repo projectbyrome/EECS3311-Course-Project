@@ -118,6 +118,21 @@ public class RecipeLibraryService implements EventListener {
         return recipe;
     }
 
+    /**
+     * F07 extra: after save(), a recipe Claude wrote keeps Claude's estimate when USDA could not work out its
+     * nutrition (no key, or an ingredient with no match), so it does not show 0 kcal.
+     */
+    public Recipe keepEstimateIfIncomplete(Recipe saved, NutritionSummary estimate) {
+        NutritionSummary n = saved.getNutritionPerServing();
+        if (estimate == null || (n != null && n.isComplete())) {
+            return saved;
+        }
+        saved.setNutrition(estimate);
+        recipeRepository.save(saved);
+        eventBus.publish(new LibraryChanged());
+        return saved;
+    }
+
     /** SD03 "recipeNutrition(r, 1), lookup as in SD05"; 5a: missing data marks it incomplete. */
     private NutritionSummary nutritionPerServing(Recipe recipe) {
         List<String> notes = foodMatcher == null ? List.of()

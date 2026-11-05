@@ -32,8 +32,9 @@ public class RecommendCommand extends AbstractCliCommand {
     @Override
     public String usage() {
         return """
-                recommend [category|any] [max minutes] [--goal high-protein|low-calorie|low-carb|profile]
+                recommend [category|any] [max minutes] [--goal high-protein|low-calorie|low-carb|profile] [--ask <words>]
                   (a category can be several words, e.g. recommend Rice Dishes 20)
+                  (--ask is a wish for the assistant, e.g. recommend any 30 --ask something I can pair with rice)
                 recommend approve <catalogue id>""";
     }
 
@@ -61,6 +62,10 @@ public class RecommendCommand extends AbstractCliCommand {
         if (goal != null) {
             filter.goal = goal.equalsIgnoreCase("profile") ? facade.getProfile().getDefaultGoal() : NutritionGoal.preset(goal);
         }
+        String ask = args.options.get("ask");
+        if (ask != null && !ask.isBlank()) {
+            filter.request = ask;
+        }
 
         RecommendationResult result = facade.recommendRecipes(filter);
         if (result.isEmpty()) {
@@ -84,11 +89,18 @@ public class RecommendCommand extends AbstractCliCommand {
         if (n < 1 || n > cards.size()) {
             throw new InvalidInputException("Choose a number from 1 to " + cards.size());
         }
-        return approve(cards.get(n - 1).recipe.getCatalogId());
+        Recommendation chosen = cards.get(n - 1);
+        if (chosen.written) {
+            return added(facade.approveWrittenRecipe(chosen.recipe));
+        }
+        return approve(chosen.recipe.getCatalogId());
     }
 
     private CommandResult approve(long catalogId) {
-        Recipe added = facade.approveRecommendation(catalogId);
+        return added(facade.approveRecommendation(catalogId));
+    }
+
+    private static CommandResult added(Recipe added) {
         String warnings = added.getWarnings().isEmpty() ? "" : " Warnings: " + String.join("; ", added.getWarnings());
         return CommandResult.ok("Added to your recipe library: " + added.getName() + " (#" + added.getId() + ")." + warnings);
     }
@@ -96,13 +108,22 @@ public class RecommendCommand extends AbstractCliCommand {
     private static String card(int number, Recommendation r) {
         Recipe recipe = r.recipe;
         StringBuilder sb = new StringBuilder();
-        sb.append(number).append(". ").append(recipe.getName()).append("  [catalogue #").append(recipe.getCatalogId())
-                .append("]  ").append(recipe.getCookMinutes()).append(" min");
+        sb.append(number).append(". ").append(recipe.getName())
+                .append(r.written ? "  [new recipe by Claude]  " : "  [catalogue #" + recipe.getCatalogId() + "]  ")
+                .append(recipe.getCookMinutes()).append(" min");
         NutritionSummary n = recipe.getNutritionPerServing();
         if (n != null) {
-            sb.append(String.format(", %.0f kcal, %.0f g protein per serving", n.getCalories(), n.getProteinG()));
+            sb.append(String.format(", %s%.0f kcal, %.0f g protein per serving", r.written ? "about " : "",
+                    n.getCalories(), n.getProteinG()));
         }
         sb.append("\n   ").append(String.join(", ", recipe.getCategories().stream().map(RecipeCategory::getName).toList()));
+        if (r.written) {
+            sb.append("\n   Ingredients: ").append(String.join(", ",
+                    recipe.ingredients().stream().map(Object::toString).toList()));
+            for (int i = 0; i < recipe.getInstructions().size(); i++) {
+                sb.append("\n   ").append(i + 1).append(". ").append(recipe.getInstructions().get(i));
+            }
+        }
         if (r.reason != null && !r.reason.isBlank()) {
             sb.append("\n   ").append(r.reason);
         }

@@ -37,6 +37,12 @@ public class CliArgs {
             String t = tokens[i];
             if (t.startsWith("--")) {
                 String key = t.substring(2);
+                if (key.equals("ask")) { // free text: every word up to the next --option
+                    List<String> words = new ArrayList<>();
+                    while (i + 1 < tokens.length && !tokens[i + 1].startsWith("--")) words.add(tokens[++i]);
+                    options.put(key, String.join(" ", words));
+                    continue;
+                }
                 String value = (i + 1 < tokens.length && !tokens[i + 1].startsWith("--")) ? tokens[++i] : "true";
                 options.put(key, value);
             } else {

@@ -48,7 +48,7 @@ public class SearchCatalogTool extends AbstractTool {
     public JsonNode inputSchema() {
         return schema("""
                 {"type": "object", "properties": {
-                  "category": {"type": "string", "description": "one category name from any group, e.g. Curry, Soup, Spicy or Poultry; omit for any"},
+                  "category": {"type": "string", "description": "one category name, e.g. Curry, Soup or Poultry (flavours such as Spicy are not searchable); omit for any"},
                   "maxCookMinutes": {"type": "integer", "description": "maximum cooking time in minutes"},
                   "dailyGoal": {"type": "object", "description": "daily goal; protein is a minimum, the rest maximums",
                     "properties": {"calories": {"type": "number"}, "proteinG": {"type": "number"},

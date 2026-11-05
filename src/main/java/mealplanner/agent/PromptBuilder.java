@@ -22,7 +22,8 @@ public class PromptBuilder {
         return request;
     }
 
-    static final int TASK_MAX_TOKENS = 1500;
+    /** Room for up to 3 recipes written by Claude (F07 extra). */
+    static final int TASK_MAX_TOKENS = 4000;
 
     /** A tool-using request (F07): profile rules and answer format in the system prompt, the goal as the user message. */
     public LLMRequest buildTaskRequest(AgentTask task, UserProfile profile, List<ToolDefinition> tools) {

@@ -26,8 +26,8 @@ import mealplanner.model.RecommendationFilter;
 import mealplanner.model.RecommendationResult;
 
 /**
- * F07 GUI (Recommendations menu): filter form (category, cooking time, nutrition goal), Search, and recipe
- * cards with an "Add to library" button. Search may call Claude several times, so it runs in a background Task.
+ * F07 GUI (Recommendations menu): an optional description for the assistant, a filter form (category,
+ * cooking time, nutrition goal), Search, and recipe cards with an "Add to library" button.
  */
 public class RecommendationView extends BorderPane {
 
@@ -37,6 +37,7 @@ public class RecommendationView extends BorderPane {
     private final ComboBox<String> categoryBox = new ComboBox<>();
     private final TextField minutesField = new TextField();
     private final ComboBox<String> goalBox = new ComboBox<>();
+    private final TextField requestField = new TextField();
     private final Button search = new Button("Search");
     private final VBox cards = new VBox(12);
     private final Label message = new Label();
@@ -51,6 +52,8 @@ public class RecommendationView extends BorderPane {
         goalBox.setValue("No goal");
         search.getStyleClass().add("primary");
         search.setOnAction(e -> onSearch());
+        requestField.setPromptText("Optional, e.g. something Japanese, or anything I can pair with rice");
+        requestField.setOnAction(e -> onSearch()); // Enter searches too
 
         HBox form = new HBox(12, field("Category", categoryBox), field("Cooking time", minutesField),
                 field("Nutrition goal", goalBox), search);
@@ -59,7 +62,7 @@ public class RecommendationView extends BorderPane {
         title.getStyleClass().add("card-title");
         Label hint = new Label("Your dietary restrictions and allergies from the Profile are always applied.");
         hint.getStyleClass().add("description");
-        VBox searchCard = new VBox(10, title, hint, form);
+        VBox searchCard = new VBox(10, title, hint, field("Describe what you want (the assistant reads this)", requestField), form);
         searchCard.getStyleClass().add("card");
 
         message.getStyleClass().add("description");
@@ -105,10 +108,13 @@ public class RecommendationView extends BorderPane {
         thread.start();
     }
 
-    /** UC07 step 6: approveRecommendation(catalogId) adds the recipe to the library. */
+    /**
+     * UC07 step 6
+     */
     public void onApprove(Recommendation recommendation, Button button) {
         try {
-            Recipe added = facade.approveRecommendation(recommendation.recipe.getCatalogId());
+            Recipe added = recommendation.written ? facade.approveWrittenRecipe(recommendation.recipe)
+                    : facade.approveRecommendation(recommendation.recipe.getCatalogId());
             message.setText("Added to your recipe library: " + added.getName()
                     + (added.getWarnings().isEmpty() ? "" : ". Warnings: " + String.join("; ", added.getWarnings())));
             button.setText("Added");
@@ -137,6 +143,7 @@ public class RecommendationView extends BorderPane {
             case "Low carb" -> NutritionGoal.preset("low-carb");
             default -> null;
         };
+        filter.request = requestField.getText().isBlank() ? null : requestField.getText().trim();
         return filter;
     }
 
@@ -159,13 +166,29 @@ public class RecommendationView extends BorderPane {
         details.setWrapText(true);
         NutritionSummary n = recipe.getNutritionPerServing();
         Label nutrition = new Label(n == null ? "" : String.format(
-                "Per serving: %.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat",
+                (r.written ? "About" : "Per serving:") + " %.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat"
+                        + (r.written ? " per serving (Claude's estimate)" : ""),
                 n.getCalories(), n.getProteinG(), n.getCarbsG(), n.getFatG()));
         Label ingredients = new Label("Ingredients: " + String.join(", ",
                 recipe.ingredients().stream().map(RecipeIngredient::toString).toList()));
         ingredients.getStyleClass().add("description");
         ingredients.setWrapText(true);
         VBox card = new VBox(6, title, details, nutrition, ingredients);
+        if (r.written) {
+            Label written = new Label("New recipe written by Claude (not from the catalogue)");
+            written.setStyle("-fx-text-fill: #F5A524;"); // amber, so it stands out from catalogue recipes
+            card.getChildren().add(1, written);
+            if (!recipe.getInstructions().isEmpty()) {
+                StringBuilder steps = new StringBuilder("Steps:");
+                for (int i = 0; i < recipe.getInstructions().size(); i++) {
+                    steps.append("\n").append(i + 1).append(". ").append(recipe.getInstructions().get(i));
+                }
+                Label stepsLabel = new Label(steps.toString());
+                stepsLabel.getStyleClass().add("description");
+                stepsLabel.setWrapText(true);
+                card.getChildren().add(stepsLabel);
+            }
+        }
         if (r.reason != null && !r.reason.isBlank()) {
             Label reason = new Label("Why: " + r.reason);
             reason.setWrapText(true);

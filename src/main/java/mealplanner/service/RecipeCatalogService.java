@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 import mealplanner.data.CatalogRepository;
+import mealplanner.domain.CategoryGroup;
 import mealplanner.domain.InvalidInputException;
 import mealplanner.domain.Recipe;
 import mealplanner.domain.RecipeCategory;
@@ -68,7 +69,9 @@ public class RecipeCatalogService {
         TreeSet<String> set = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         for (Recipe r : catalogRepository.findAll()) {
             for (RecipeCategory c : r.getCategories()) {
-                set.add(c.getName());
+                if (c.getGroup() != CategoryGroup.FLAVOR) { // flavours are left out of Recommendations
+                    set.add(c.getName());
+                }
             }
         }
         return List.copyOf(set);
