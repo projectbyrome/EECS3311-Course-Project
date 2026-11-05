@@ -18,8 +18,8 @@ import mealplanner.domain.NutritionSummary;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
-import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.StapleStatus;
+import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.UserProfile;
 import mealplanner.domain.ValidationReport;
 import mealplanner.model.DaySummary;
@@ -189,6 +189,16 @@ public class AppFacade {
 
     public void removePantryItem(long itemId) {
         pantryService.remove(itemId);
+    }
+
+    /** True if the pantry (and recipes) already know this ingredient name. */
+    public boolean isKnownIngredient(String name) {
+        return pantryService.isKnownIngredient(name);
+    }
+
+    /** Adds a new ingredient name (e.g. ketchup) so it can be used in the pantry and elsewhere. */
+    public Ingredient addIngredient(String name) {
+        return pantryService.addIngredient(name);
     }
 
     /** Adds a staple (no amount, only have / running low), or changes the status of one already there. */

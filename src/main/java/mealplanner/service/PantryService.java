@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.TreeSet;
 import mealplanner.data.IngredientRepository;
@@ -270,6 +271,30 @@ public class PantryService {
             }
         }
         return new PantryStatusSummary(List.copyOf(missing), List.copyOf(runningLow));
+    }
+
+    /** True if the name is in the ingredient list (the 57 built-in ones plus any added later). */
+    public boolean isKnownIngredient(String name) {
+        return name != null && !name.isBlank() && ingredientRepository.findByName(name.trim()).isPresent();
+    }
+
+    /**
+     * Adds a new ingredient to the list (e.g. ketchup), so it can go in the pantry, recipes and checklists.
+     * Like the ingredients Claude adds for written recipes: category "Other", no allergen tags, and a
+     * density of 1 g/ml so cups and spoons can still be converted.
+     */
+    public Ingredient addIngredient(String name) {
+        String cleanName = name == null ? "" : name.trim().toLowerCase(Locale.ROOT);
+        if (cleanName.isEmpty()) {
+            throw new InvalidInputException("Type an ingredient name first");
+        }
+        Optional<Ingredient> existing = ingredientRepository.findByName(cleanName);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        Ingredient ingredient = new Ingredient(0, cleanName, "Other", 0, 1.0);
+        ingredientRepository.save(ingredient);
+        return ingredient;
     }
 
     public void remove(long itemId) {

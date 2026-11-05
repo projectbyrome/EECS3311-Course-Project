@@ -58,6 +58,7 @@ public class PantryView extends BorderPane implements EventListener {
     private final TextField nameField = new TextField();
     private final TextField amountField = new TextField();
     private final ComboBox<Unit> unitBox = new ComboBox<>();
+    /** "All", "Ingredient" or "Staple". */
     private String filter = "All";
 
     public PantryView(AppFacade facade) {
@@ -115,6 +116,7 @@ public class PantryView extends BorderPane implements EventListener {
     /** SD02 from the GUI: addPantryItem(name, quantity). Unknown names and bad amounts show a message. */
     public void onAdd() {
         try {
+            if (!knownOrAdded(nameField.getText())) return;
             facade.addPantryItem(nameField.getText(), readQuantity(amountField.getText(), unitBox.getValue()));
             nameField.clear();
             amountField.clear();
@@ -127,12 +129,32 @@ public class PantryView extends BorderPane implements EventListener {
     /** A staple has no amount: only Have / Running low (the amount and unit boxes are ignored). */
     public void onAddStaple() {
         try {
+            if (!knownOrAdded(nameField.getText())) return;
             facade.addStaple(nameField.getText(), StapleStatus.HAVE);
             nameField.clear();
             amountField.clear();
         } catch (AppException ex) {
             showError(ex.getMessage());
         }
+    }
+
+    /**
+     * A name that isn't in the ingredient list (e.g. ketchup) can be added to it after a yes/no question.
+     * Returns false if the user said no. A blank name goes through so the usual error is shown.
+     */
+    private boolean knownOrAdded(String name) {
+        if (name == null || name.isBlank() || facade.isKnownIngredient(name)) {
+            return true;
+        }
+        Alert ask = new Alert(Alert.AlertType.CONFIRMATION,
+                "\"" + name.trim() + "\" isn't a known ingredient yet. Add it to the ingredient list?",
+                ButtonType.YES, ButtonType.NO);
+        ask.setHeaderText("New ingredient");
+        if (ask.showAndWait().filter(b -> b == ButtonType.YES).isEmpty()) {
+            return false;
+        }
+        facade.addIngredient(name);
+        return true;
     }
 
     public void onEdit(PantryItem item) {
@@ -208,7 +230,7 @@ public class PantryView extends BorderPane implements EventListener {
 
     /**
      * All / Ingredient / Staple as one rounded control; the chosen part is filled with the accent colour.
-     * Drawn with plain panes and Text
+     * Drawn with plain panes and Text (no style classes), so Theme leaves these colours alone.
      */
     private HBox segmentedFilter() {
         HBox control = new HBox(4);
