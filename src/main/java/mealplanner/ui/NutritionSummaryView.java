@@ -33,7 +33,7 @@ import mealplanner.model.DaySummary;
 /**
  * F10 GUI (SD07): the nutrition of a day or a week compared with the daily goals, Claude's short summary,
  * and a form to edit the goals. It opens in its own window when "Day nutrition" or "Week nutrition" is
- * clicked in the Meal Calendar.
+ * clicked in the Meal Calendar. Colours come from Theme (style-class names).
  */
 public class NutritionSummaryView extends HBox implements EventListener {
 
@@ -79,6 +79,11 @@ public class NutritionSummaryView extends HBox implements EventListener {
     /** SD07: daySummary(date) in a background task, because it may call USDA and Claude. */
     public void onShowDay(LocalDate date) {
         onOpen.run();
+        loadDay(date);
+    }
+
+    /** Works out the day without opening the window (used when a meal changes while the window is open). */
+    private void loadDay(LocalDate date) {
         shown = date;
         showingWeek = false;
         int mine = ++request;
@@ -102,6 +107,11 @@ public class NutritionSummaryView extends HBox implements EventListener {
     /** SD07 week view: weekSummary(weekStart), compared with seven times the daily goal. */
     public void onShowWeek(LocalDate weekStart) {
         onOpen.run();
+        loadWeek(weekStart);
+    }
+
+    /** Adds up the week without opening the window. */
+    private void loadWeek(LocalDate weekStart) {
         shown = weekStart;
         showingWeek = true;
         int mine = ++request;
@@ -150,10 +160,16 @@ public class NutritionSummaryView extends HBox implements EventListener {
     public void onEvent(AppEvent event) {
         Platform.runLater(() -> {
             if (event instanceof ProfileChanged) fillGoalForm(facade.getProfile().getDefaultGoal());
-            if (shown == null) return;
+            // Only redraw while the summary window is open, and never open it from here:
+            // adding a meal should not pop the window up.
+            if (shown == null || !isWindowOpen()) return;
             if (event instanceof CalendarChanged c && !affectsShown(c.date)) return;
-            if (showingWeek) onShowWeek(shown); else onShowDay(shown);
+            if (showingWeek) loadWeek(shown); else loadDay(shown);
         });
+    }
+
+    private boolean isWindowOpen() {
+        return getScene() != null && getScene().getWindow() != null && getScene().getWindow().isShowing();
     }
 
     private boolean affectsShown(LocalDate date) {

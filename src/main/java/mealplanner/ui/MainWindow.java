@@ -7,6 +7,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Region;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
@@ -15,8 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * The main window: a menu down the left side, and the chosen feature's screen on the right.
- * The ☰ button in the top bar hides and shows the menu.
+ * The main window: a menu down the left side (Profile first: it is also the home page), and the chosen feature's screen on the right.
+ * The ☰ button in the top bar hides and shows the menu. Colours and fonts come from Theme.
  */
 public class MainWindow {
 
@@ -29,7 +32,8 @@ public class MainWindow {
 
     public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView,
                       MacroGeneratorView macroGeneratorView, RecipeLibraryView recipeLibraryView, ProfileView profileView,
-                      RecommendationView recommendationView, NutritionSummaryView nutritionSummaryView) {
+                      RecommendationView recommendationView, NutritionSummaryView nutritionSummaryView,
+                      HomeView homeView) {
         Button toggle = new Button("☰");
         toggle.getStyleClass().add("menu-toggle");
         toggle.setOnAction(e -> toggleMenu());
@@ -44,7 +48,10 @@ public class MainWindow {
         menu.setPrefWidth(200);
         root.setLeft(menu);
 
-        addPage("Profile", "Your diet, allergies and favourite recipe categories.", profileView);
+        homeView.setPageOpener(this::showPage);
+        homeView.setSummaryHandler(nutritionSummaryView::onShowDay);
+        addPage("Profile", "What are we eating today? Your meals, your diet and your goals in one place.",
+                profileHomePage(homeView, profileView));
         addPage("Meal Calendar", "Plan your meals for the month, and see their nutrition.", calendarView);
         connectSummaryWindow(nutritionSummaryView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
@@ -53,7 +60,7 @@ public class MainWindow {
         addPage("Recipe Library", "Your own recipes: add, edit, remove and mark favourites.", recipeLibraryView);
         addPage("Recommendations", "Recipe ideas from the catalogue that fit your profile.", recommendationView);
 
-        buttons.get(1).setSelected(true); // open on the Meal Calendar, not the Profile
+        buttons.get(0).setSelected(true); // open on the Profile page (the home page)
     }
 
     /**
@@ -82,6 +89,32 @@ public class MainWindow {
         }, () -> {
             if (summaryStage != null) summaryStage.hide();
         });
+    }
+
+    /**
+     * The Profile page is also the home page: today's meals and the feature tiles on top, then the profile
+     * cards (restrictions, allergies, favourite categories, daily goals). The whole page scrolls as one.
+     */
+    private static ScrollPane profileHomePage(HomeView homeView, ProfileView profileView) {
+        homeView.setFitToHeight(false);
+        homeView.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // the outer page scrolls instead
+        homeView.setMinHeight(Region.USE_PREF_SIZE);
+        Label yours = new Label("Your profile");
+        yours.getStyleClass().add("section-title");
+        VBox both = new VBox(18, homeView, yours, profileView);
+        both.setPadding(new Insets(0, 8, 0, 0));
+        ScrollPane page = new ScrollPane(both);
+        page.setFitToWidth(true);
+        return page;
+    }
+
+    /** Opens the page with this menu name, e.g. "Pantry" (used by the Home page tiles). */
+    public void showPage(String name) {
+        for (ToggleButton button : buttons) {
+            if (button.getText().equals(name)) {
+                button.setSelected(true);
+            }
+        }
     }
 
     /** Hides the menu if it is showing, or shows it again if it is hidden. */

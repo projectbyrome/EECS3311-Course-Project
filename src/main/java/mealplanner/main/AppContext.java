@@ -64,6 +64,7 @@ import mealplanner.service.ShoppingNeedsCalculator;
 import mealplanner.service.UnitConverter;
 import mealplanner.service.WrittenRecipeConverter;
 import mealplanner.ui.ChecklistView;
+import mealplanner.ui.HomeView;
 import mealplanner.ui.MacroGeneratorView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
@@ -148,8 +149,15 @@ public class AppContext {
             eventBus.subscribe(ProfileChanged.class, summaryView);
             eventBus.subscribe(CalendarChanged.class, summaryView);
             eventBus.subscribe(LibraryChanged.class, summaryView);
+            HomeView homeView = new HomeView(facade);
+            // Observer: the Home page redraws when meals, the pantry, goals, checklists or recipes change.
+            eventBus.subscribe(CalendarChanged.class, homeView);
+            eventBus.subscribe(PantryChanged.class, homeView);
+            eventBus.subscribe(ProfileChanged.class, homeView);
+            eventBus.subscribe(ChecklistChanged.class, homeView);
+            eventBus.subscribe(LibraryChanged.class, homeView);
             mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, libraryView,
-                    profileView, recommendationView, summaryView);
+                    profileView, recommendationView, summaryView, homeView);
         }
         return mainWindow;
     }
