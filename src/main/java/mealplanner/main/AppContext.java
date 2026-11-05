@@ -15,11 +15,13 @@ import mealplanner.agent.tools.SearchCatalogTool;
 import mealplanner.agent.tools.SearchLibraryTool;
 import mealplanner.agent.tools.ToolManager;
 import mealplanner.agent.workflows.DaySummaryWriter;
+import mealplanner.agent.workflows.DietGuideChat;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
 import mealplanner.app.AppFacade;
 import mealplanner.cli.CalendarCommand;
+import mealplanner.cli.ChatCommand;
 import mealplanner.cli.ChecklistCommand;
 import mealplanner.cli.CliApp;
 import mealplanner.cli.FavCommand;
@@ -64,8 +66,9 @@ import mealplanner.service.ShoppingNeedsCalculator;
 import mealplanner.service.UnitConverter;
 import mealplanner.service.WrittenRecipeConverter;
 import mealplanner.ui.ChecklistView;
-import mealplanner.ui.HomeView;
 import mealplanner.ui.MacroGeneratorView;
+import mealplanner.ui.DietGuideView;
+import mealplanner.ui.HomeView;
 import mealplanner.ui.MainWindow;
 import mealplanner.ui.MealCalendarView;
 import mealplanner.ui.NutritionSummaryView;
@@ -149,6 +152,7 @@ public class AppContext {
             eventBus.subscribe(ProfileChanged.class, summaryView);
             eventBus.subscribe(CalendarChanged.class, summaryView);
             eventBus.subscribe(LibraryChanged.class, summaryView);
+            DietGuideView dietGuideView = new DietGuideView(facade);
             HomeView homeView = new HomeView(facade);
             // Observer: the Home page redraws when meals, the pantry, goals, checklists or recipes change.
             eventBus.subscribe(CalendarChanged.class, homeView);
@@ -157,7 +161,7 @@ public class AppContext {
             eventBus.subscribe(ChecklistChanged.class, homeView);
             eventBus.subscribe(LibraryChanged.class, homeView);
             mainWindow = new MainWindow(calendarView, checklistView, pantryView, macroView, libraryView,
-                    profileView, recommendationView, summaryView, homeView);
+                    profileView, recommendationView, summaryView, homeView, dietGuideView);
         }
         return mainWindow;
     }
@@ -229,6 +233,8 @@ public class AppContext {
         facade = new AppFacade(mealCalendarService, recipeLibraryService, pantryService, checklistService,
                 shoppingListGenerator, macroGenerator, profileService, recipeRecommender, recipeCatalogService,
                 nutritionService, daySummaryWriter);
+        // Extra: the Diet Guide chat may search the catalogue for example recipes (same tools as F07).
+        facade.setDietGuideChat(new DietGuideChat(llm, toolManager));
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);
@@ -256,6 +262,7 @@ public class AppContext {
         cli.register(new RecipeCommand(facade, in, out));
         cli.register(new FavCommand(facade, in, out));
         cli.register(new SummaryCommand(facade, in, out));
+        cli.register(new ChatCommand(facade, in, out));
     }
 
     private Database openDatabase() {

@@ -27,7 +27,7 @@ import mealplanner.model.RecommendationResult;
 
 /**
  * F07 GUI (Recommendations menu): an optional description for the assistant, a filter form (category,
- * cooking time, nutrition goal), Search, and recipe cards with an "Add to library" button.
+ * cooking time, nutrition goal), Search, and recipe cards with an "Add to library" button. Search may call Claude several times, so it runs in a background Task.
  */
 public class RecommendationView extends BorderPane {
 
@@ -76,6 +76,18 @@ public class RecommendationView extends BorderPane {
         setCenter(scroll);
     }
 
+    /**
+     * From the Diet Guide's "How to cook it": clears the other filters, puts the dish in "Describe what you
+     * want" and searches, so Claude shows that dish from the catalogue or writes its recipe.
+     */
+    public void lookUpDish(String request) {
+        categoryBox.setValue(ANY);
+        minutesField.clear();
+        goalBox.setValue("No goal");
+        requestField.setText(request);
+        onSearch();
+    }
+
     /** SD06: recommendRecipes(filter) in the background, then one card per recommendation. */
     public void onSearch() {
         RecommendationFilter filter;
@@ -109,7 +121,8 @@ public class RecommendationView extends BorderPane {
     }
 
     /**
-     * UC07 step 6
+     * UC07 step 6: approveRecommendation(catalogId) adds the recipe to the library; a recipe Claude wrote
+     * itself is saved with approveWrittenRecipe(recipe), which also works out its nutrition.
      */
     public void onApprove(Recommendation recommendation, Button button) {
         try {

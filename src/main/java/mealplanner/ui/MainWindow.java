@@ -16,6 +16,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import mealplanner.model.DietGuideReply;
 
 /**
  * The main window: a menu down the left side (Profile first: it is also the home page), and the chosen feature's screen on the right.
@@ -33,7 +34,7 @@ public class MainWindow {
     public MainWindow(MealCalendarView calendarView, ChecklistView checklistView, PantryView pantryView,
                       MacroGeneratorView macroGeneratorView, RecipeLibraryView recipeLibraryView, ProfileView profileView,
                       RecommendationView recommendationView, NutritionSummaryView nutritionSummaryView,
-                      HomeView homeView) {
+                      HomeView homeView, DietGuideView dietGuideView) {
         Button toggle = new Button("☰");
         toggle.getStyleClass().add("menu-toggle");
         toggle.setOnAction(e -> toggleMenu());
@@ -59,6 +60,12 @@ public class MainWindow {
         addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
         addPage("Recipe Library", "Your own recipes: add, edit, remove and mark favourites.", recipeLibraryView);
         addPage("Recommendations", "Recipe ideas from the catalogue that fit your profile.", recommendationView);
+        dietGuideView.setCookHandler(dish -> {
+            showPage("Recommendations");
+            recommendationView.lookUpDish(DietGuideReply.cookRequest(dish));
+        });
+        addPage("Diet Guide", "Learn about diets and what nutrition coaches recommend. General information, not personal advice.",
+                dietGuideView);
 
         buttons.get(0).setSelected(true); // open on the Profile page (the home page)
     }

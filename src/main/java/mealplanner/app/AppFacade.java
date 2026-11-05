@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import mealplanner.agent.workflows.DaySummaryWriter;
+import mealplanner.agent.workflows.DietGuideChat;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
@@ -22,6 +23,7 @@ import mealplanner.domain.StapleStatus;
 import mealplanner.domain.RecipeIngredient;
 import mealplanner.domain.UserProfile;
 import mealplanner.domain.ValidationReport;
+import mealplanner.model.DietGuideReply;
 import mealplanner.model.DaySummary;
 import mealplanner.model.FinishResult;
 import mealplanner.model.NutritionSelection;
@@ -40,7 +42,7 @@ import mealplanner.service.RecipeLibraryService;
 
 /**
  * Facade: the one entry point used by both the GUI views and the CLI commands.
- * One group of methods per feature, F01 to F10.
+ * One group of methods per feature, F01 to F10, and new feature: dietguide.
  */
 public class AppFacade {
 
@@ -55,6 +57,8 @@ public class AppFacade {
     private final RecipeCatalogService recipeCatalogService;
     private final NutritionService nutritionService;
     private final DaySummaryWriter daySummaryWriter;
+    /** Extra feature: the Diet Guide chat (set by AppContext after construction). */
+    private DietGuideChat dietGuideChat;
 
     /** F01-F05 only (used by the earlier tests); profile and recommendation calls then fail. */
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
@@ -359,5 +363,21 @@ public class AppFacade {
     /** F07 extra: adds a recipe Claude wrote (not from the catalogue) to the library and returns the saved copy. */
     public Recipe approveWrittenRecipe(Recipe recipe) {
         return recipeRecommender.addWritten(recipe);
+    }
+
+    // ---- Extra: Diet Guide chat ----
+
+    public void setDietGuideChat(DietGuideChat chat) {
+        this.dietGuideChat = chat;
+    }
+
+    /** Asks the Diet Guide one question, with the conversation so far. Needs Claude. */
+    public DietGuideReply askDietGuide(String question) {
+        return dietGuideChat.ask(question);
+    }
+
+    /** Forgets the Diet Guide conversation. */
+    public void startNewDietChat() {
+        dietGuideChat.clear();
     }
 }
