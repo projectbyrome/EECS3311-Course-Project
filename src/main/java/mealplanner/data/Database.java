@@ -137,6 +137,7 @@ public class Database {
             // version the new column too (CREATE TABLE IF NOT EXISTS skips a table that already exists).
             addColumnIfMissing(st, "recipe", "nutrition", "TEXT");                  // F08: nutrition per serving
             addColumnIfMissing(st, "meal_entry", "notes", "TEXT NOT NULL DEFAULT ''"); // F01: meal notes
+            addColumnIfMissing(st, "pantry_item", "staple_status", "TEXT");        // F04: staples (null = ingredient)
         } catch (SQLException e) {
             throw new DataAccessException("Migration failed", e);
         }

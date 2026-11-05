@@ -122,6 +122,10 @@ public class ChecklistService {
 
     private void flag(ChecklistItem item) {
         Optional<PantryItem> inPantry = pantryService.findByIngredient(item.getName());
+        if (inPantry.isPresent() && inPantry.get().isStaple()) {
+            item.setAlreadyInPantry(true); // a staple has no amount to show
+            return;
+        }
         item.setPantryQuantity(inPantry.map(PantryItem::getQuantity).orElse(null));
     }
 }

@@ -7,6 +7,8 @@ import mealplanner.app.AppFacade;
 import mealplanner.domain.InvalidInputException;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
+import mealplanner.domain.StapleStatus;
+import mealplanner.service.PantryService;
 
 /**
  * F04 from the command line (SD02): pantry list | add | set | remove.
@@ -29,7 +31,9 @@ public class PantryCommand extends AbstractCliCommand {
                 pantry list
                 pantry add    <ingredient> <amount> <unit>   e.g. pantry add eggs 12 PIECE
                 pantry set    <item id> <amount> <unit>      (change the quantity)
-                pantry remove <item id>""";
+                pantry remove <item id>
+                pantry staple <ingredient> [have|low]       e.g. pantry staple salt   or   pantry staple olive oil low
+                    (a staple has no amount, only a status; running the command again changes the status)""";
     }
 
     @Override
@@ -38,6 +42,7 @@ public class PantryCommand extends AbstractCliCommand {
             case "list", "" -> list();
             case "add" -> add(args.positional);
             case "set" -> set(args.positional);
+            case "staple" -> staple(args.positional);
             case "remove" -> {
                 if (args.positional.size() != 1) {
                     throw new InvalidInputException("Usage: pantry remove <item id>");
@@ -57,7 +62,9 @@ public class PantryCommand extends AbstractCliCommand {
         StringBuilder sb = new StringBuilder();
         for (PantryItem item : items) {
             sb.append('#').append(item.getId()).append(' ').append(item.getIngredient().getName())
-                    .append(": ").append(format(item.getQuantity())).append('\n');
+                    .append(": ")
+                    .append(item.isStaple() ? "staple, " + item.getStapleStatus().label().toLowerCase()
+                            : PantryService.isOutOfStock(item) ? "out of stock" : format(item.getQuantity())).append('\n');
         }
         return CommandResult.ok(sb.toString().trim());
     }
@@ -88,6 +95,19 @@ public class PantryCommand extends AbstractCliCommand {
             return ChecklistCommand.parseQuantity("1", unit).times(0);
         }
         return ChecklistCommand.parseQuantity(amount, unit);
+    }
+
+    /** pantry staple salt | pantry staple olive oil low: the last word is the status if it is have or low. */
+    private CommandResult staple(List<String> words) {
+        if (words.isEmpty()) {
+            throw new InvalidInputException("Usage: pantry staple <ingredient> [have|low]");
+        }
+        String last = words.get(words.size() - 1).toLowerCase();
+        boolean hasStatus = words.size() > 1 && (last.equals("have") || last.equals("low"));
+        StapleStatus status = hasStatus ? StapleStatus.parse(last) : StapleStatus.HAVE;
+        String name = String.join(" ", hasStatus ? words.subList(0, words.size() - 1) : words);
+        PantryItem item = facade.addStaple(name, status);
+        return CommandResult.ok(item.getIngredient().getName() + " is a staple: " + status.label().toLowerCase() + ".");
     }
 
     /** 12.0 PIECE is shown as 12 PIECE. */

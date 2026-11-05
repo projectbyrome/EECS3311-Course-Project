@@ -15,7 +15,7 @@ import mealplanner.model.ShoppingNeed;
 
 /**
  * F03 exact arithmetic (no AI): scales the chosen recipes, merges the same ingredient across recipes,
- * and subtracts what the pantry already has. Claude only tidies the result; it never does the maths.
+ * and subtracts what the pantry already has. Claude only tidies the result.
  */
 public class ShoppingNeedsCalculator {
 
@@ -90,6 +90,9 @@ public class ShoppingNeedsCalculator {
         double left = amount.getAmount();
         for (PantryItem item : pantry) {
             if (item.getIngredient().getId() != ing.getId()) continue;
+            if (item.isStaple()) {
+                return new Quantity(0, amount.getUnit()); // a staple counts as available, so nothing to buy
+            }
             Quantity have = item.getQuantity();
             if (converter.canConvert(have.getUnit(), amount.getUnit(), ing)) {
                 left -= converter.convert(have, amount.getUnit(), ing).getAmount();

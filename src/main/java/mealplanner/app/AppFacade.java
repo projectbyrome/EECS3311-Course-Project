@@ -19,11 +19,13 @@ import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
 import mealplanner.domain.RecipeIngredient;
+import mealplanner.domain.StapleStatus;
 import mealplanner.domain.UserProfile;
 import mealplanner.domain.ValidationReport;
 import mealplanner.model.DaySummary;
 import mealplanner.model.FinishResult;
 import mealplanner.model.NutritionSelection;
+import mealplanner.model.PantryStatusSummary;
 import mealplanner.model.RecipeSelection;
 import mealplanner.model.RecommendationFilter;
 import mealplanner.model.RecommendationResult;
@@ -188,6 +190,23 @@ public class AppFacade {
     public void removePantryItem(long itemId) {
         pantryService.remove(itemId);
     }
+
+    /** Adds a staple (no amount, only have / running low), or changes the status of one already there. */
+    public PantryItem addStaple(String name, StapleStatus status) {
+        return pantryService.addStaple(name, status);
+    }
+
+    public void setStapleStatus(long itemId, StapleStatus status) {
+        pantryService.setStapleStatus(itemId, status);
+    }
+
+    /** Shopping page summary: missing ingredients (planned meals from today on) and staples running low. */
+    public PantryStatusSummary pantryStatusSummary() {
+        return pantryService.statusSummary(mealCalendarService.getDays(LocalDate.now(), PLANNING_DAYS));
+    }
+
+    /** How far ahead the summary looks for planned meals (the calendar's month view shows up to 6 weeks). */
+    static final int PLANNING_DAYS = 42;
 
     // ---- F05 macros ----
 

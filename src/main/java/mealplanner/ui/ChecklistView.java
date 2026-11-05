@@ -21,10 +21,16 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import mealplanner.app.AppFacade;
 import mealplanner.domain.AppException;
 import mealplanner.domain.Checklist;
@@ -37,6 +43,7 @@ import mealplanner.events.AppEvent;
 import mealplanner.events.EventListener;
 import mealplanner.model.DraftItem;
 import mealplanner.model.FinishResult;
+import mealplanner.model.PantryStatusSummary;
 import mealplanner.model.RecipeSelection;
 import mealplanner.model.ShoppingDraft;
 
@@ -52,6 +59,11 @@ public class ChecklistView extends BorderPane implements EventListener {
     private final AppFacade facade;
     private final ListView<Checklist> lists = new ListView<>();
     private final VBox itemsBox = new VBox(6);
+    /** Pantry status summary (information only). */
+    private final VBox missingGroup = new VBox(6);
+    private final VBox lowGroup = new VBox(6);
+    private static final Color MISSING_COLOUR = Color.web("#F58A8F");
+    private static final Color LOW_COLOUR = Color.web("#F7C163");
     private final Label title = new Label();
     private final TextField itemName = new TextField();
     private final TextField itemAmount = new TextField();
@@ -91,6 +103,20 @@ public class ChecklistView extends BorderPane implements EventListener {
         VBox right = new VBox(12, title, itemsBox, addRow, finish);
         right.getStyleClass().add("card");
 
+        Label statusTitle = new Label("Pantry status");
+        statusTitle.getStyleClass().add("card-title");
+        Label statusNote = new Label("For information only: your shopping lists are not changed.");
+        statusNote.getStyleClass().add("description");
+        HBox groups = new HBox(12, missingGroup, lowGroup);
+        for (VBox g : List.of(missingGroup, lowGroup)) {
+            g.setPrefWidth(0); // the two groups share the width equally
+            HBox.setHgrow(g, Priority.ALWAYS);
+        }
+        VBox statusCard = new VBox(10, statusTitle, groups, statusNote);
+        statusCard.getStyleClass().add("card");
+        BorderPane.setMargin(statusCard, new Insets(0, 0, 16, 0));
+
+        setTop(statusCard);
         setLeft(left);
         setCenter(right);
         reload();
@@ -258,6 +284,7 @@ public class ChecklistView extends BorderPane implements EventListener {
     }
 
     private void reload() {
+        showStatus(facade.pantryStatusSummary());
         Checklist selected = lists.getSelectionModel().getSelectedItem();
         long selectedId = selected == null ? -1 : selected.getId();
         lists.getItems().setAll(facade.getChecklists());
@@ -265,6 +292,24 @@ public class ChecklistView extends BorderPane implements EventListener {
                 .ifPresentOrElse(c -> lists.getSelectionModel().select(c),
                         () -> lists.getSelectionModel().selectFirst());
         showItems(lists.getSelectionModel().getSelectedItem());
+    }
+
+    /** The two summary groups: "Missing" ingredients and "Running low" staples, with their counts. */
+    private void showStatus(PantryStatusSummary summary) {
+        fillGroup(missingGroup, "Missing", summary.missing, MISSING_COLOUR, "Nothing missing");
+        fillGroup(lowGroup, "Running low", summary.runningLow, LOW_COLOUR, "No staples running low");
+    }
+
+    private static void fillGroup(VBox group, String name, List<String> items, Color colour, String empty) {
+        Text heading = new Text(name + " (" + items.size() + ")");
+        heading.setFont(Font.font("Inter SemiBold", 13));
+        heading.setFill(colour);
+        Label names = new Label(items.isEmpty() ? empty : String.join(", ", items));
+        if (items.isEmpty()) names.getStyleClass().add("description");
+        names.setWrapText(true);
+        group.getChildren().setAll(heading, names);
+        group.setPadding(new Insets(10, 12, 12, 12));
+        group.setBackground(new Background(new BackgroundFill(Theme.PANEL, new CornerRadii(8), Insets.EMPTY)));
     }
 
     private void showItems(Checklist checklist) {

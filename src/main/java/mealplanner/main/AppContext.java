@@ -130,6 +130,8 @@ public class AppContext {
             eventBus.subscribe(CalendarChanged.class, calendarView);
             eventBus.subscribe(ChecklistChanged.class, checklistView);
             eventBus.subscribe(PantryChanged.class, checklistView);
+            // The Shopping page's pantry status also depends on the planned meals.
+            eventBus.subscribe(CalendarChanged.class, checklistView);
             eventBus.subscribe(PantryChanged.class, pantryView);
             ProfileView profileView = new ProfileView(facade);
             RecommendationView recommendationView = new RecommendationView(facade);
@@ -253,7 +255,7 @@ public class AppContext {
             Path parent = Path.of(config.dbPath).toAbsolutePath().getParent();
             if (parent != null) Files.createDirectories(parent);
         } catch (java.io.IOException e) {
-            throw new DataAccessException("Cannot create the folder for "+ config.dbPath, e);
+            throw new DataAccessException("Cannot create the folder for " + config.dbPath, e);
         }
         Database db = new Database(config.dbPath);
         db.migrate();

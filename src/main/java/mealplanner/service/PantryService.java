@@ -2,20 +2,26 @@ package mealplanner.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 import mealplanner.data.IngredientRepository;
 import mealplanner.data.PantryRepository;
 import mealplanner.domain.ChecklistItem;
+import mealplanner.domain.DayPlan;
 import mealplanner.domain.Ingredient;
 import mealplanner.domain.InvalidInputException;
+import mealplanner.domain.MealEntry;
 import mealplanner.domain.PantryItem;
 import mealplanner.domain.Quantity;
 import mealplanner.domain.Recipe;
 import mealplanner.domain.RecipeIngredient;
+import mealplanner.domain.StapleStatus;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
 import mealplanner.model.FinishResult;
+import mealplanner.model.PantryStatusSummary;
 
 /**
  * Pantry logic (F04, CD4): validates and merges pantry items. Also used by F01 (missingFor, consume)
@@ -36,8 +42,17 @@ public class PantryService {
         this.eventBus = eventBus;
     }
 
+    /** All pantry items in alphabetical order (A to Z, ignoring upper/lower case). */
     public List<PantryItem> getItems() {
-        return pantryRepository.findAll();
+        List<PantryItem> items = new ArrayList<>(pantryRepository.findAll());
+        items.sort(Comparator.comparing((PantryItem i) -> i.getIngredient().getName(), String.CASE_INSENSITIVE_ORDER)
+                .thenComparingLong(PantryItem::getId));
+        return items;
+    }
+
+    /** True when the amount left is 0 (anything under 0.005 counts as 0, so rounding leftovers do too). */
+    public static boolean isOutOfStock(PantryItem item) {
+        return !item.isStaple() && item.getQuantity().getAmount() < 0.005;
     }
 
     /**
@@ -52,6 +67,9 @@ public class PantryService {
             if (item.isEmpty()) {
                 missing.add(need);
                 continue;
+            }
+            if (item.get().isStaple()) {
+                continue; // a staple (have or running low) counts as available, whatever the amount
             }
             Quantity have = item.get().getQuantity();
             if (!converter.canConvert(have.getUnit(), need.getQuantity().getUnit(), ingredient)) {
@@ -82,6 +100,9 @@ public class PantryService {
                 continue;
             }
             PantryItem item = found.get();
+            if (item.isStaple()) {
+                continue; // staples have no amount to subtract
+            }
             Quantity have = item.getQuantity();
             if (!converter.canConvert(used.getQuantity().getUnit(), have.getUnit(), ingredient)) {
                 warnings.add("Could not subtract " + used + " (units do not match the pantry)");
@@ -124,6 +145,13 @@ public class PantryService {
             Ingredient ingredient = known.get();
             Quantity q = bought.getQuantity();
             Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+            if (existing.isPresent() && existing.get().isStaple()) {
+                existing.get().setStapleStatus(StapleStatus.HAVE); // a bought staple is back to "have"
+                pantryRepository.save(existing.get());
+                merged++;
+                moved++;
+                continue;
+            }
             if (existing.isPresent()
                     && converter.canConvert(q.getUnit(), existing.get().getQuantity().getUnit(), ingredient)) {
                 PantryItem item = existing.get();
@@ -153,6 +181,9 @@ public class PantryService {
                 .orElseThrow(() -> new InvalidInputException("Unknown ingredient: " + cleanName));
         requirePositive(quantity);
         Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+        if (existing.isPresent() && existing.get().isStaple()) {
+            throw new InvalidInputException(ingredient.getName() + " is a staple (no amount). Change its status instead.");
+        }
         PantryItem item;
         if (existing.isPresent()
                 && converter.canConvert(quantity.getUnit(), existing.get().getQuantity().getUnit(), ingredient)) {
@@ -173,9 +204,72 @@ public class PantryService {
             throw new InvalidInputException("Enter an amount and a unit");
         }
         PantryItem item = requireItem(itemId);
+        if (item.isStaple()) {
+            throw new InvalidInputException(item.getIngredient().getName() + " is a staple (no amount). Change its status instead.");
+        }
         item.setQuantity(quantity);
         pantryRepository.save(item);
         eventBus.publish(new PantryChanged());
+    }
+
+    /**
+     * Adds a staple (salt, oil, spices...) with a status and no amount, or changes the status of one
+     * already in the pantry. An ingredient that is tracked by amount must be removed first.
+     */
+    public PantryItem addStaple(String name, StapleStatus status) {
+        String cleanName = name == null ? "" : name.trim();
+        Ingredient ingredient = ingredientRepository.findByName(cleanName)
+                .orElseThrow(() -> new InvalidInputException("Unknown ingredient: " + cleanName));
+        Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+        PantryItem item;
+        if (existing.isPresent() && !existing.get().isStaple()) {
+            throw new InvalidInputException(ingredient.getName()
+                    + " is tracked by amount. Remove it first to make it a staple.");
+        } else if (existing.isPresent()) {
+            item = existing.get();
+            item.setStapleStatus(status);
+        } else {
+            item = PantryItem.staple(ingredient, status, LocalDate.now());
+        }
+        pantryRepository.save(item);
+        eventBus.publish(new PantryChanged());
+        return item;
+    }
+
+    /** Have / Running low for a staple. */
+    public void setStapleStatus(long itemId, StapleStatus status) {
+        PantryItem item = requireItem(itemId);
+        if (!item.isStaple()) {
+            throw new InvalidInputException(item.getIngredient().getName() + " is not a staple");
+        }
+        item.setStapleStatus(status);
+        pantryRepository.save(item);
+        eventBus.publish(new PantryChanged());
+    }
+
+    /**
+     * Shopping page summary (information only, nothing is changed): ingredients that are out of stock or
+     * that a planned meal on one of these days is missing or short of, and staples marked running low.
+     */
+    public PantryStatusSummary statusSummary(List<DayPlan> plannedDays) {
+        TreeSet<String> missing = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        TreeSet<String> runningLow = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        for (PantryItem item : getItems()) {
+            if (item.isStaple() && item.getStapleStatus() == StapleStatus.RUNNING_LOW) {
+                runningLow.add(item.getIngredient().getName());
+            } else if (isOutOfStock(item)) {
+                missing.add(item.getIngredient().getName());
+            }
+        }
+        for (DayPlan day : plannedDays) {
+            if (day.isClosed()) continue;
+            for (MealEntry meal : day.activeEntries()) {
+                for (RecipeIngredient need : missingFor(meal.getRecipe(), meal.getServings())) {
+                    missing.add(need.getIngredient().getName());
+                }
+            }
+        }
+        return new PantryStatusSummary(List.copyOf(missing), List.copyOf(runningLow));
     }
 
     public void remove(long itemId) {

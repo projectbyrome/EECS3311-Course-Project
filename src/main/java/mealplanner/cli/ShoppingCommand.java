@@ -9,6 +9,7 @@ import mealplanner.app.AppFacade;
 import mealplanner.domain.Checklist;
 import mealplanner.domain.InvalidInputException;
 import mealplanner.model.DraftItem;
+import mealplanner.model.PantryStatusSummary;
 import mealplanner.model.RecipeSelection;
 import mealplanner.model.ShoppingDraft;
 
@@ -29,11 +30,15 @@ public class ShoppingCommand extends AbstractCliCommand {
         return """
                 shopping generate --recipes 3x4,5x2 [--list id] [--yes]
                     (recipe id x servings; adds to checklist id, or to a new checklist if --list is not given;
-                     --yes approves without asking)""";
+                     --yes approves without asking)
+                shopping status   (missing ingredients and staples running low; changes nothing)""";
     }
 
     @Override
     public CommandResult execute(CliArgs args) {
+        if (args.subcommand.equals("status")) {
+            return CommandResult.ok(status(facade.pantryStatusSummary()));
+        }
         if (!args.subcommand.equals("generate")) {
             return CommandResult.error("Unknown sub-command '" + args.subcommand + "'.\n" + usage());
         }
@@ -52,6 +57,14 @@ public class ShoppingCommand extends AbstractCliCommand {
         Checklist checklist = facade.approveShoppingDraft(draft, listId);
         return CommandResult.ok("Added " + draft.items.size() + " item(s) to checklist #" + checklist.getId()
                 + " " + checklist.getName() + ".");
+    }
+
+    /** The Shopping page summary as text: two groups with their counts and names. */
+    static String status(PantryStatusSummary summary) {
+        return "Missing (" + summary.missing.size() + "): "
+                + (summary.missing.isEmpty() ? "nothing" : String.join(", ", summary.missing))
+                + "\nRunning low (" + summary.runningLow.size() + "): "
+                + (summary.runningLow.isEmpty() ? "nothing" : String.join(", ", summary.runningLow));
     }
 
     /** "3x4,5x2" means recipe 3 for 4 servings and recipe 5 for 2 servings. */
