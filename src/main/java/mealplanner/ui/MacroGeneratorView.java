@@ -59,10 +59,12 @@ public class MacroGeneratorView extends BorderPane {
         ingredientBox.setOnShowing(e -> reloadChoices());
         amountField.setPromptText("Amount");
         amountField.setPrefWidth(80);
+        amountField.setMinWidth(80);
         unitBox.getItems().setAll(Unit.values());
         unitBox.setValue(Unit.G);
         Button addIngredient = new Button("Add");
         addIngredient.setOnAction(e -> onAddSelection(false));
+        addIngredient.setMinWidth(javafx.scene.layout.Region.USE_PREF_SIZE); // keep "Add" readable, not "..."
 
         Button remove = new Button("Remove");
         remove.setOnAction(e -> {
@@ -126,8 +128,13 @@ public class MacroGeneratorView extends BorderPane {
                 } catch (NumberFormatException ex) {
                     throw new InvalidInputException("Amount must be a number.");
                 }
-                selections.getItems().add(new IngredientPortion(name.trim(), new Quantity(amount, unitBox.getValue())));
-                amountField.clear();
+                Quantity quantity = new Quantity(amount, unitBox.getValue());
+                // a name that isn't in the ingredient list (e.g. ketchup) is checked with Claude first
+                NewIngredientDialog.ensureKnown(facade, name, this, known -> {
+                    selections.getItems().add(new IngredientPortion(known.trim(), quantity));
+                    ingredientBox.getEditor().clear();
+                    amountField.clear();
+                }, this::showError);
             }
         } catch (AppException ex) {
             showError(ex.getMessage());

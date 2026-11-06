@@ -76,7 +76,8 @@ public class PantryCommand extends AbstractCliCommand {
         }
         String name = String.join(" ", words.subList(0, words.size() - 2)).replace("\"", "");
         Quantity q = ChecklistCommand.parseQuantity(words.get(words.size() - 2), words.get(words.size() - 1));
-        if (!knownOrAdded(name)) {
+        name = knownIngredientOrAsk(name);
+        if (name == null) {
             return CommandResult.ok("Nothing was added.");
         }
         PantryItem item = facade.addPantryItem(name, q);
@@ -108,24 +109,12 @@ public class PantryCommand extends AbstractCliCommand {
         String last = words.get(words.size() - 1).toLowerCase();
         boolean hasStatus = words.size() > 1 && (last.equals("have") || last.equals("low"));
         StapleStatus status = hasStatus ? StapleStatus.parse(last) : StapleStatus.HAVE;
-        String name = String.join(" ", hasStatus ? words.subList(0, words.size() - 1) : words);
-        if (!knownOrAdded(name)) {
+        String name = knownIngredientOrAsk(String.join(" ", hasStatus ? words.subList(0, words.size() - 1) : words));
+        if (name == null) {
             return CommandResult.ok("Nothing was added.");
         }
         PantryItem item = facade.addStaple(name, status);
         return CommandResult.ok(item.getIngredient().getName() + " is a staple: " + status.label().toLowerCase() + ".");
-    }
-
-    /** An unknown name (e.g. ketchup) is added to the ingredient list if the user answers y. */
-    private boolean knownOrAdded(String name) {
-        if (facade.isKnownIngredient(name)) {
-            return true;
-        }
-        if (!confirm("'" + name + "' isn't a known ingredient yet. Add it to the ingredient list?")) {
-            return false;
-        }
-        facade.addIngredient(name);
-        return true;
     }
 
     /** 12.0 PIECE is shown as 12 PIECE. */

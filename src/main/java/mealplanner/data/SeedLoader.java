@@ -48,6 +48,27 @@ public class SeedLoader {
     }
 
     /**
+     * Clearer cooking steps for the bundled recipes (times, heat, what to look for). Format:
+     * [{"name": "Omelette", "old": ["Whisk the eggs.", ...], "new": ["Whisk the eggs for about 30-60 seconds...", ...]}]
+     * Each entry is returned as {name, old steps, new steps}, with the steps joined by new lines (as stored in SQLite).
+     */
+    public List<String[]> loadStepUpdates(String path) {
+        List<String[]> list = new ArrayList<>();
+        for (JsonNode n : read(path)) {
+            list.add(new String[] {n.path("name").asText(), joinLines(n.path("old")), joinLines(n.path("new"))});
+        }
+        return list;
+    }
+
+    private static String joinLines(JsonNode array) {
+        List<String> lines = new ArrayList<>();
+        for (JsonNode line : array) {
+            lines.add(line.asText());
+        }
+        return String.join("\n", lines);
+    }
+
+    /**
      * Temporary sample recipes so the app can be tried before the Recipe Library (F08) exists. Format:
      * [{"name": "Omelette", "servings": 1, "cuisine": "French", "cookMinutes": 10,
      *   "ingredients": [{"name": "eggs", "amount": 3, "unit": "PIECE"}], "instructions": ["..."]}]

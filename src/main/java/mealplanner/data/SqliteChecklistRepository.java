@@ -18,6 +18,9 @@ import mealplanner.domain.Unit;
 /** SQLite implementation of ChecklistRepository. */
 public class SqliteChecklistRepository implements ChecklistRepository {
 
+    private static final String STAPLE = "STAPLE";
+
+
     private final Database db;
 
     public SqliteChecklistRepository(Database db) {
@@ -97,8 +100,9 @@ public class SqliteChecklistRepository implements ChecklistRepository {
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, checklistId);
             ps.setString(2, item.getName());
-            ps.setDouble(3, item.getQuantity().getAmount());
-            ps.setString(4, item.getQuantity().getUnit().name());
+            // a staple has no amount: it is saved as amount 0 with the unit text STAPLE
+            ps.setDouble(3, item.isStaple() ? 0 : item.getQuantity().getAmount());
+            ps.setString(4, item.isStaple() ? STAPLE : item.getQuantity().getUnit().name());
             ps.setInt(5, item.isChecked() ? 1 : 0);
             ps.setInt(6, item.isAlreadyInPantry() ? 1 : 0);
             ps.executeUpdate();
@@ -158,8 +162,9 @@ public class SqliteChecklistRepository implements ChecklistRepository {
             ps.setLong(1, list.getId());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    ChecklistItem item = new ChecklistItem(rs.getString("name"),
-                            new Quantity(rs.getDouble("amount"), Unit.valueOf(rs.getString("unit"))));
+                    String unit = rs.getString("unit");
+                    ChecklistItem item = STAPLE.equals(unit) ? ChecklistItem.staple(rs.getString("name"))
+                            : new ChecklistItem(rs.getString("name"), new Quantity(rs.getDouble("amount"), Unit.valueOf(unit)));
                     item.setId(rs.getLong("id"));
                     item.setChecked(rs.getInt("checked") == 1);
                     // only the flag is stored; ChecklistService fills in the pantry amount when the lists are shown

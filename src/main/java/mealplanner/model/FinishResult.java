@@ -19,7 +19,7 @@ public class FinishResult {
     public String toString() {
         String text = movedCount + " item(s) moved to the pantry (" + mergedCount + " added to items already there).";
         if (!notAdded.isEmpty()) {
-            text += " Not added (unknown ingredient): " + String.join(", ", notAdded) + ".";
+            text += " Not added (unknown ingredient, still on the list): " + String.join(", ", notAdded) + ".";
         }
         return text;
     }

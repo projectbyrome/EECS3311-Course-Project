@@ -44,7 +44,9 @@ import mealplanner.events.AppEvent;
 import mealplanner.events.EventListener;
 
 /**
- * F08 + F09 GUI (Recipe Library menu)
+ * F08 + F09 GUI (Recipe Library menu): the library list with a search box and a Favourites filter on the left,
+ * the recipe form on the right (name, categories, time, servings, ingredient rows, steps), its warnings and
+ * nutrition per serving, and Save, Remove and the heart button.
  */
 public class RecipeLibraryView extends BorderPane implements EventListener {
 
@@ -140,11 +142,7 @@ public class RecipeLibraryView extends BorderPane implements EventListener {
         nameRow.setAlignment(Pos.BOTTOM_LEFT);
         HBox.setHgrow(nameRow.getChildren().get(0), Priority.ALWAYS);
         HBox timeRow = new HBox(12, field("Cooking time (minutes)", minutesField), field("Servings", servingsField));
-        Label categoryHint = new Label("Separate with commas. Use Group:Name to pick the group "
-                + "(Dish Type, Main Ingredient, Flavor, Cooking Method, Other).");
-        categoryHint.getStyleClass().add("description");
-        categoryHint.setWrapText(true);
-        VBox detailsCard = card("Recipe", nameRow, field("Categories", categoriesField), categoryHint, timeRow);
+        VBox detailsCard = card("Recipe", nameRow, field("Categories", categoriesField), timeRow);
 
         Label ingredientHint = new Label("Amount and unit are required. Ingredient names come from the "
                 + "ingredient list (e.g. pasta, tomato, chicken breast).");

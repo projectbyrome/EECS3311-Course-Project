@@ -1,6 +1,9 @@
 package mealplanner.domain;
 
-/** One grocery item on a checklist, with a quantity and an "already in pantry" flag (F02). */
+/**
+ * One grocery item on a checklist, with a quantity and an "already in pantry" flag (F02).
+ * A staple (ketchup, salt...) has no amount: its quantity is null and Finish Shopping marks it "Have".
+ */
 public class ChecklistItem {
 
     /** 0 until the ChecklistRepository saves the item. */
@@ -13,14 +16,23 @@ public class ChecklistItem {
     private Quantity pantryQuantity;
 
     public ChecklistItem(String name, Quantity quantity) {
+        this(name, quantity, false);
+    }
+
+    /** A staple item: no amount needed. */
+    public static ChecklistItem staple(String name) {
+        return new ChecklistItem(name, null, true);
+    }
+
+    private ChecklistItem(String name, Quantity quantity, boolean staple) {
         if (name == null || name.isBlank()) {
             throw new InvalidInputException("An item needs a name");
         }
-        if (quantity == null || quantity.getAmount() <= 0) {
+        if (!staple && (quantity == null || quantity.getAmount() <= 0)) {
             throw new InvalidInputException("Quantity of " + name + " must be greater than 0");
         }
         this.name = name.trim();
-        this.quantity = quantity;
+        this.quantity = staple ? null : quantity;
     }
 
     public void setChecked(boolean checked) {
@@ -39,17 +51,39 @@ public class ChecklistItem {
         if (!flag) this.pantryQuantity = null;
     }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
-    public String getName() { return name; }
-    public Quantity getQuantity() { return quantity; }
-    public boolean isChecked() { return checked; }
-    public boolean isAlreadyInPantry() { return alreadyInPantry; }
-    public Quantity getPantryQuantity() { return pantryQuantity; }
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    /** Null for a staple. */
+    public Quantity getQuantity() {
+        return quantity;
+    }
+    public boolean isStaple() {
+        return quantity == null;
+    }
+    /** "12 PIECE", or "staple" for a staple. */
+    public String amountText() {
+        return isStaple() ? "staple" : quantity.toString();
+    }
+    public boolean isChecked() {
+        return checked;
+    }
+    public boolean isAlreadyInPantry() {
+        return alreadyInPantry;
+    }
+    public Quantity getPantryQuantity() {
+        return pantryQuantity;
+    }
 
     @Override
     public String toString() {
-        String text = (checked ? "[x] " : "[ ] ") + name + " " + quantity;
+        String text = (checked ? "[x] " : "[ ] ") + name + " " + amountText();
         if (alreadyInPantry) {
             text += "  (already in pantry" + (pantryQuantity != null ? ": " + pantryQuantity : "") + ")";
         }

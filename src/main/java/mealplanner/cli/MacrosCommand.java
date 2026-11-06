@@ -51,7 +51,14 @@ public class MacrosCommand extends AbstractCliCommand {
             }
         }
         if (items != null) {
-            selections.addAll(parseItems(items));
+            for (NutritionSelection s : parseItems(items)) {
+                IngredientPortion ip = (IngredientPortion) s;
+                String name = knownIngredientOrAsk(ip.ingredientName); // e.g. ketchup: checked with Claude first
+                if (name == null) {
+                    return CommandResult.ok("Nothing was calculated.");
+                }
+                selections.add(new IngredientPortion(name, ip.amount));
+            }
         }
         NutritionSummary total = facade.generateMacros(selections);
         return CommandResult.ok("Nutrition for " + describe(selections) + ":\n" + total);

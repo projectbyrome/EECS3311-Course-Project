@@ -1,0 +1,309 @@
+[
+  {
+    "name": "Spaghetti Pomodoro",
+    "old": [
+      "Cook the pasta in salted water.",
+      "Fry the garlic in the olive oil, add the tomatoes and simmer 10 minutes.",
+      "Toss with the pasta, basil and parmesan."
+    ],
+    "new": [
+      "Bring a large pot of salted water to a boil over high heat, add the pasta and cook for about 9-11 minutes (or the time on the packet), stirring now and then, until tender but still slightly firm to the bite (al dente). Drain.",
+      "Meanwhile, heat the olive oil in a pan over medium heat and fry the garlic for about 30-60 seconds, until fragrant and just turning light golden (don't let it brown).",
+      "Add the tomatoes and simmer for 10 minutes over medium-low heat, stirring now and then, until the sauce has thickened slightly.",
+      "Take off the heat and toss with the pasta, basil and parmesan until the pasta is evenly coated."
+    ]
+  },
+  {
+    "name": "Chicken Parmesan Pasta",
+    "old": [
+      "Cook the pasta.",
+      "Brown the chicken in the oil, add the tomatoes.",
+      "Top with both cheeses until melted and serve over the pasta."
+    ],
+    "new": [
+      "Cook the pasta in a large pot of salted boiling water over high heat for about 9-11 minutes (or the time on the packet), until al dente. Drain.",
+      "Heat the oil in an oven-safe or lidded pan over medium-high heat and brown the chicken for about 4-5 minutes per side, until golden on both sides.",
+      "Add the tomatoes, lower the heat to medium-low and simmer for about 8-10 minutes, until the chicken is cooked through (no pink inside, 74 °C / 165 °F in the thickest part) and the sauce has thickened slightly.",
+      "Top with both cheeses, cover with a lid (or put under a hot broiler) for about 2-3 minutes, until the cheese has melted and is bubbling. Serve over the pasta."
+    ]
+  },
+  {
+    "name": "Garlic Shrimp Linguine",
+    "old": [
+      "Cook the pasta.",
+      "Fry the garlic and shrimp in butter and oil.",
+      "Add lemon juice and toss with the pasta."
+    ],
+    "new": [
+      "Cook the pasta in a large pot of salted boiling water over high heat for about 9-11 minutes (or the time on the packet), until al dente. Drain.",
+      "Heat the butter and oil in a pan over medium heat until the butter has melted and is foaming. Fry the garlic for about 30 seconds, until fragrant.",
+      "Add the shrimp and fry for about 2-3 minutes, turning once, until pink all over and just opaque in the middle (don't overcook or they turn rubbery).",
+      "Take off the heat, add the lemon juice and toss with the pasta until coated."
+    ]
+  },
+  {
+    "name": "Mushroom Risotto",
+    "old": [
+      "Soften the onion and mushrooms in the oil.",
+      "Add the rice and stock a ladle at a time, stirring, for 20 minutes.",
+      "Stir in the butter and parmesan."
+    ],
+    "new": [
+      "Heat the oil in a wide pan over medium heat and soften the onion and mushrooms for about 6-8 minutes, stirring, until the onion is soft and see-through and the mushrooms have released their liquid and browned lightly.",
+      "Add the rice and stir for about 1 minute, until the grains are coated in oil and the edges look translucent.",
+      "Add hot stock a ladle at a time, stirring, for 20 minutes over medium-low heat, waiting until each ladle is almost absorbed before adding the next, until the rice is creamy and tender with a slight bite.",
+      "Take off the heat and stir in the butter and parmesan until melted and glossy. Rest for about 1-2 minutes before serving."
+    ]
+  },
+  {
+    "name": "Caprese Salad",
+    "old": [
+      "Slice the tomatoes and mozzarella.",
+      "Layer with basil and drizzle with olive oil."
+    ],
+    "new": [
+      "Slice the tomatoes and mozzarella into rounds about 1 cm (1/2 inch) thick.",
+      "Layer them on a plate, alternating tomato and mozzarella, with basil leaves in between, and drizzle with olive oil."
+    ]
+  },
+  {
+    "name": "Chicken Burrito Bowl",
+    "old": [
+      "Cook the rice.",
+      "Season the chicken with chili powder and cook with the pepper.",
+      "Serve on rice with beans, avocado and lime."
+    ],
+    "new": [
+      "Rinse the rice, then simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until the water is absorbed and the rice is tender. Rest it covered for about 5 minutes off the heat.",
+      "Season the chicken with chili powder. Cook it with the pepper in a pan over medium-high heat for about 6-8 minutes per side, until the chicken is golden and cooked through (no pink inside, 74 °C / 165 °F) and the pepper is soft.",
+      "Warm the beans in a small pot over medium heat for about 3-4 minutes, until hot.",
+      "Slice the chicken and serve on the rice with the pepper, beans, avocado and a squeeze of lime."
+    ]
+  },
+  {
+    "name": "Black Bean Tacos",
+    "old": [
+      "Warm the beans and tortillas.",
+      "Fill with beans, avocado, tomato and lettuce.",
+      "Squeeze lime over."
+    ],
+    "new": [
+      "Warm the beans in a small pot over medium heat for about 3-5 minutes, stirring, until hot all the way through.",
+      "Warm the tortillas in a dry pan over medium heat for about 20-30 seconds per side, until soft and lightly spotted.",
+      "Fill with the beans, avocado, tomato and lettuce.",
+      "Squeeze lime over just before serving."
+    ]
+  },
+  {
+    "name": "Beef Chili",
+    "old": [
+      "Brown the beef with the onion and pepper.",
+      "Add chili powder, tomatoes and beans.",
+      "Simmer 30 minutes."
+    ],
+    "new": [
+      "Brown the beef with the onion and pepper in a large pot over medium-high heat for about 8-10 minutes, breaking up the meat, until no pink is left and the onion is soft.",
+      "Add the chili powder and stir for about 1 minute until fragrant, then add the tomatoes and beans.",
+      "Bring to a boil, then simmer 30 minutes over low heat, stirring now and then, until thickened and the flavours have come together."
+    ]
+  },
+  {
+    "name": "Chickpea Curry",
+    "old": [
+      "Fry the onion, garlic and ginger.",
+      "Add curry powder, tomatoes, coconut milk and chickpeas; simmer 15 minutes.",
+      "Stir in the spinach."
+    ],
+    "new": [
+      "Fry the onion in a pan over medium heat for about 5-7 minutes, until soft and golden at the edges, then add the garlic and ginger and fry for about 1 minute, until fragrant.",
+      "Add the curry powder and stir for about 30 seconds, then add the tomatoes, coconut milk and chickpeas; simmer 15 minutes over medium-low heat, until slightly thickened.",
+      "Stir in the spinach for about 1-2 minutes, until just wilted."
+    ]
+  },
+  {
+    "name": "Chicken Curry with Rice",
+    "old": [
+      "Marinate the chicken in yogurt and curry powder.",
+      "Fry the onion, garlic and ginger, add the chicken and tomatoes.",
+      "Simmer 20 minutes and serve with rice."
+    ],
+    "new": [
+      "Marinate the chicken in the yogurt and curry powder for at least about 20 minutes (or up to overnight in the fridge).",
+      "Meanwhile, simmer the rice covered in about twice its volume of water over low heat for about 15-18 minutes, until the water is absorbed and the rice is tender.",
+      "Fry the onion in a pan over medium heat for about 5-7 minutes until soft and golden, add the garlic and ginger for about 1 minute until fragrant, then add the chicken and fry for about 3-4 minutes until sealed on all sides. Add the tomatoes.",
+      "Simmer 20 minutes over medium-low heat, until the chicken is cooked through (no pink inside) and the sauce has thickened, and serve with the rice."
+    ]
+  },
+  {
+    "name": "Teriyaki Salmon",
+    "old": [
+      "Mix soy sauce, honey and ginger.",
+      "Pan-fry the salmon and glaze with the sauce.",
+      "Serve with rice and steamed broccoli."
+    ],
+    "new": [
+      "Mix the soy sauce, honey and ginger.",
+      "Cook the rice: simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until tender. Steam the broccoli for about 4-5 minutes, until bright green and just tender.",
+      "Pan-fry the salmon skin side down in a pan over medium-high heat for about 4 minutes, until the skin is crisp, then turn and cook for about 2-3 minutes more, until the flesh flakes easily.",
+      "Lower the heat to medium, pour in the sauce and glaze the salmon for about 1 minute, spooning it over, until the sauce is sticky and glossy.",
+      "Serve with the rice and steamed broccoli."
+    ]
+  },
+  {
+    "name": "Tofu Stir-fry",
+    "old": [
+      "Cook the rice.",
+      "Fry the tofu in sesame oil until golden.",
+      "Add the vegetables, garlic and soy sauce and stir-fry 5 minutes."
+    ],
+    "new": [
+      "Cook the rice: simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until tender.",
+      "Fry the tofu in the sesame oil over medium-high heat for about 6-8 minutes, turning, until golden on all sides.",
+      "Add the vegetables, garlic and soy sauce and stir-fry 5 minutes over high heat, until the broccoli is bright green and tender-crisp."
+    ]
+  },
+  {
+    "name": "Egg Fried Rice",
+    "old": [
+      "Use cooked, cooled rice.",
+      "Scramble the eggs in sesame oil, add the carrot and rice.",
+      "Season with soy sauce and green onion."
+    ],
+    "new": [
+      "Use cooked, cooled rice (cooked at least a few hours ahead, or the day before, so the grains are dry and separate).",
+      "Scramble the eggs in the sesame oil over medium-high heat for about 1 minute, until just set. Add the carrot and stir-fry for about 2 minutes, then add the rice and stir-fry for about 3-4 minutes, until the rice is hot and starting to crisp.",
+      "Season with soy sauce and green onion, tossing for about 30 seconds until evenly coloured."
+    ]
+  },
+  {
+    "name": "Greek Salad",
+    "old": [
+      "Chop the vegetables.",
+      "Top with feta, olive oil and lemon juice."
+    ],
+    "new": [
+      "Chop the vegetables into bite-size pieces.",
+      "Top with feta, olive oil and lemon juice."
+    ]
+  },
+  {
+    "name": "Peanut Noodles",
+    "old": [
+      "Cook the noodles.",
+      "Whisk peanut butter, soy sauce and lime juice with a little water.",
+      "Toss with the noodles, carrot and green onion."
+    ],
+    "new": [
+      "Cook the noodles in salted boiling water over high heat for about 8-10 minutes (or the time on the packet), until tender. Drain and rinse briefly in cold water.",
+      "Whisk the peanut butter, soy sauce and lime juice with a little water for about 1 minute, until smooth and pourable.",
+      "Toss with the noodles, carrot and green onion until evenly coated."
+    ]
+  },
+  {
+    "name": "Thai Shrimp Curry",
+    "old": [
+      "Cook the rice.",
+      "Simmer coconut milk with curry powder and the pepper.",
+      "Add the shrimp for 4 minutes, finish with basil and lime."
+    ],
+    "new": [
+      "Cook the rice: simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until tender.",
+      "Simmer the coconut milk with the curry powder and the pepper over medium heat for about 5 minutes, until the pepper is soft.",
+      "Add the shrimp for 4 minutes, until pink and opaque, then finish with basil and lime."
+    ]
+  },
+  {
+    "name": "Overnight Oats",
+    "old": [
+      "Mix the oats and milk and leave overnight in the fridge.",
+      "Top with banana, honey and almonds."
+    ],
+    "new": [
+      "Mix the oats and milk and leave overnight in the fridge (at least about 6-8 hours), until the oats are soft and have absorbed most of the milk.",
+      "Top with banana, honey and almonds."
+    ]
+  },
+  {
+    "name": "Quinoa Power Bowl",
+    "old": [
+      "Cook the quinoa.",
+      "Toss with chickpeas and spinach.",
+      "Top with avocado, lemon juice and olive oil."
+    ],
+    "new": [
+      "Rinse the quinoa, then simmer it covered in about twice its volume of water over low heat for about 15 minutes, until the water is absorbed and the grains show a little curl. Rest covered for about 5 minutes and fluff with a fork.",
+      "Toss with the chickpeas and spinach.",
+      "Top with avocado, lemon juice and olive oil."
+    ]
+  },
+  {
+    "name": "Bacon and Eggs on Toast",
+    "old": [
+      "Fry the bacon.",
+      "Fry the eggs in butter.",
+      "Serve on toast."
+    ],
+    "new": [
+      "Fry the bacon in a pan over medium heat for about 6-8 minutes, turning once, until crisp. Drain on paper towel.",
+      "Fry the eggs in the butter over medium-low heat for about 3-4 minutes, until the whites are set and the yolks are still runny (longer if you like them firm). Toast the bread for about 2-3 minutes, until golden.",
+      "Serve the bacon and eggs on the toast."
+    ]
+  },
+  {
+    "name": "Pork Chops with Potatoes",
+    "old": [
+      "Roast the potatoes with oil and garlic for 30 minutes.",
+      "Pan-fry the pork chops.",
+      "Serve with steamed broccoli."
+    ],
+    "new": [
+      "Heat the oven to 200 °C (400 °F). Cut the potatoes into chunks, toss with the oil and garlic and roast for 30 minutes, turning halfway, until golden and soft inside.",
+      "Pan-fry the pork chops over medium-high heat for about 4-5 minutes per side, until golden and cooked through (63 °C / 145 °F inside), then rest them for about 3 minutes.",
+      "Steam the broccoli for about 4-5 minutes, until bright green and just tender, and serve with the chops and potatoes."
+    ]
+  },
+  {
+    "name": "Omelette",
+    "old": [
+      "Whisk the eggs.",
+      "Melt the butter in a pan and cook the eggs.",
+      "Add the cheese and fold."
+    ],
+    "new": [
+      "Whisk the eggs for about 30-60 seconds, until the yolks and whites are fully mixed and a little frothy.",
+      "Melt the butter in a pan over medium-low heat until foaming, then cook the eggs for about 2-3 minutes, gently pulling the set edges to the middle, until almost set but still slightly glossy on top.",
+      "Add the cheese and fold, then cook for about 30 seconds more, until the cheese melts."
+    ]
+  },
+  {
+    "name": "Chicken Wrap",
+    "old": [
+      "Cook and slice the chicken.",
+      "Fill the tortilla and roll it up."
+    ],
+    "new": [
+      "Cook the chicken in a pan over medium-high heat for about 6-8 minutes per side, until golden and cooked through (no pink inside, 74 °C / 165 °F), rest for about 3 minutes, then slice.",
+      "Fill the tortilla with the chicken, lettuce and tomato and roll it up."
+    ]
+  },
+  {
+    "name": "Chili",
+    "old": [
+      "Brown the beef with the onion.",
+      "Add the rest and simmer for 30 minutes."
+    ],
+    "new": [
+      "Brown the beef with the onion over medium-high heat for about 8-10 minutes, breaking up the meat, until no pink is left and the onion is soft.",
+      "Add the rest and simmer for 30 minutes over low heat, stirring now and then, until thickened."
+    ]
+  },
+  {
+    "name": "Overnight Oats",
+    "old": [
+      "Mix everything in a jar and leave it in the fridge overnight."
+    ],
+    "new": [
+      "Mix everything in a jar and leave it in the fridge overnight (at least about 6-8 hours), until the oats are soft and have absorbed most of the milk."
+    ]
+  }
+]

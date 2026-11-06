@@ -62,6 +62,17 @@ public class ChecklistService {
         return item;
     }
 
+    /** A staple (ketchup, salt...) with no amount. Finish Shopping adds it to the pantry as a staple marked Have. */
+    public ChecklistItem addStaple(long checklistId, String name) {
+        Checklist checklist = get(checklistId);
+        ChecklistItem item = ChecklistItem.staple(name);
+        flag(item);
+        checklist.addItem(item);
+        checklistRepository.save(checklist);
+        eventBus.publish(new ChecklistChanged(checklistId));
+        return item;
+    }
+
     /** F03: adds the items of an approved shopping draft to a checklist. */
     public Checklist addItems(long checklistId, List<DraftItem> items) {
         Checklist checklist = get(checklistId);
@@ -105,7 +116,8 @@ public class ChecklistService {
 
     /**
      * UC02 steps 5-6: ticked items go into the pantry (PantryService publishes PantryChanged),
-     * then the checklist keeps only the unticked items.
+     * then the checklist keeps the unticked items and any ticked item whose name isn't a known ingredient
+     * (so it isn't lost; the user can add the ingredient and finish again).
      */
     public FinishResult finishShopping(long checklistId) {
         Checklist checklist = get(checklistId);
@@ -114,7 +126,12 @@ public class ChecklistService {
             throw new InvalidInputException("Tick the items you bought first.");
         }
         FinishResult result = pantryService.addPurchased(ticked);
-        checklist.removeChecked();
+        for (ChecklistItem item : ticked) {
+            boolean kept = result.notAdded.stream().anyMatch(n -> n.equalsIgnoreCase(item.getName()));
+            if (!kept) {
+                checklist.removeItem(item.getId());
+            }
+        }
         checklistRepository.save(checklist);
         eventBus.publish(new ChecklistChanged(checklistId));
         return result;

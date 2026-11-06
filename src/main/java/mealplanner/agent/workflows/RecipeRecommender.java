@@ -35,6 +35,8 @@ import mealplanner.service.WrittenRecipeConverter;
  * recipes that pass the filters, without reasons (4a).
  * Extra: when the catalogue has no good fit, Claude may write a new recipe itself. WrittenRecipeConverter
  * turns it into a Recipe, and it gets the same checks; addWritten() saves it to the library when approved.
+ * When the user asks for a specific dish ("omelette") that the catalogue doesn't have, Claude writes that dish
+ * instead of offering different ones. If a written recipe is left out by the checks, the message says why.
  */
 public class RecipeRecommender {
 
@@ -45,16 +47,24 @@ public class RecipeRecommender {
             Reply with JSON only: an array of at most 3 objects, best first, e.g.
             [{"catalogId": 4, "reason": "one short sentence for the user"}]
             Use only catalogId values returned by search_recipe_catalog.
-            Prefer catalogue recipes. Only if fewer than 3 catalogue recipes fit well, you may write new recipes
-            yourself to fill the list, in this form instead of catalogId:
+            Prefer catalogue recipes. If fewer than 3 catalogue recipes fit well, or the user asked for a dish the
+            catalogue doesn't have, write new recipes yourself, in this form instead of catalogId:
             {"newRecipe": {"name": "Miso Glazed Salmon", "servings": 2, "cookMinutes": 25,
               "categories": ["DISH_TYPE:Main Course", "MAIN_INGREDIENT:Fish", "COOKING_METHOD:Baked"],
               "ingredients": [{"name": "salmon fillet", "amount": 300, "unit": "g", "allergens": ["fish"]},
                               {"name": "miso paste", "amount": 2, "unit": "tbsp", "allergens": ["soy"]},
                               {"name": "egg", "amount": 2, "unit": "piece", "gramsPerPiece": 50, "allergens": ["egg"]}],
-              "steps": ["short step one", "short step two"],
+              "steps": ["Heat the oven to 200 °C (400 °F).",
+                        "Whisk the miso with 1 tbsp water for about 30 seconds, until smooth, and brush it over the salmon.",
+                        "Bake for about 12-15 minutes, until the salmon flakes easily and the glaze is browned at the edges."],
               "nutritionPerServing": {"calories": 420, "proteinG": 35, "carbsG": 12, "fatG": 24}},
              "reason": "one short sentence for the user"}
+            Write the steps of a new recipe in full; never shorten or leave out a step. Every step that takes time
+            (whisking, kneading, frying, boiling, simmering, baking, roasting, resting, marinating, ...) gives a time
+            or a range and what to look for when it is done ("until golden", "until doubled in size", "until stiff
+            peaks form"). Give the heat level (low, medium, medium-high, high) or the oven temperature in °C and °F
+            whenever something is cooked. Times are estimates, so write "about" before them (e.g. "for about 3-5
+            minutes"); never make an estimate look exact.
             A new recipe must follow every strict rule and the user's filters. Units: g, kg, ml, l, tsp, tbsp, cup or
             piece. List every allergen of each ingredient, using words like peanut, tree nut, milk, egg, soy, gluten,
             fish, shellfish, sesame. Use simple, common ingredient names. Reply [] if nothing fits.""";
@@ -106,6 +116,7 @@ public class RecipeRecommender {
         }
 
         List<Recommendation> cards = new ArrayList<>();
+        List<String> leftOut = new ArrayList<>(); // written recipes the checks removed, with the reason
         Set<Long> seen = new LinkedHashSet<>();
         for (RecommendationPick pick : picks) {
             if (cards.size() == MAX_PICKS) break;
@@ -115,24 +126,38 @@ public class RecipeRecommender {
             try {
                 recipe = written ? toRecipe(pick.newRecipe) : recipeCatalogService.getById(pick.catalogId);
             } catch (AppException e) {
-                continue; // an id Claude made up, or a written recipe the app cannot read
+                // an id Claude made up (skipped quietly), or a written recipe the app cannot read (named in the note)
+                if (written) leftOut.add((pick.newRecipe.name == null ? "a recipe" : pick.newRecipe.name)
+                        + " (couldn't be read: " + e.getMessage() + ")");
+                continue;
             }
             if (recipe == null) continue;
             // safety net: the pick must pass the user's own filters and break no dietary rule
-            if (!filters.stream().allMatch(f -> f.matches(recipe)) || !profile.violations(recipe).isEmpty()) {
+            List<String> broken = profile.violations(recipe);
+            if (!broken.isEmpty()) {
+                if (written) leftOut.add(recipe.getName() + " (" + String.join("; ", broken) + ")");
+                continue;
+            }
+            if (!filters.stream().allMatch(f -> f.matches(recipe))) {
+                if (written) leftOut.add(recipe.getName() + " (doesn't match your filters, e.g. category or cooking time)");
                 continue;
             }
             cards.add(new Recommendation(recipe, pick.reason, written));
         }
+        String note = leftOut.isEmpty() ? null
+                : "Claude wrote " + String.join(", ", leftOut) + ", but it was left out.";
         if (cards.isEmpty()) {
             // Claude found nothing usable; if the catalogue has matches after all, show them without reasons
-            return fallback(filter, profile, null);
+            RecommendationResult shown = fallback(filter, profile, note);
+            return note == null || !shown.isEmpty() ? shown : new RecommendationResult(List.of(), note);
         }
-        return new RecommendationResult(cards, null);
+        return new RecommendationResult(cards, note);
     }
 
     /**
-     * Adds a recipe Claude wrote to the library
+     * Adds a recipe Claude wrote to the library: new ingredients are saved first, then RecipeLibraryService.save()
+     * checks it, works out the nutrition (USDA, as in SD03) and adds the profile's warnings. If USDA cannot work
+     * the nutrition out, Claude's estimate is kept instead.
      */
     public Recipe addWritten(Recipe recipe) {
         if (converter == null) {
@@ -160,10 +185,17 @@ public class RecipeRecommender {
                         r.getCategories().stream().map(RecipeCategory::getName).toList()) + ")")).toList()));
         if (filter != null && filter.hasRequest()) {
             context.append("\nWhat the user asked for, in their own words: \"").append(filter.request.trim()).append("\"")
-                    .append("\nThis is a wish, not a category name: search without a category if needed, then pick the ")
-                    .append("recipes that fit it best. If none fit it well, pick the closest ones and say so in the reason.");
+                    .append("\nThis is a wish, not a category name: search without a category if needed.")
+                    .append("\nIf it names a specific dish (for example \"omelette\" or \"banana bread\"), the user wants ")
+                    .append("that dish: use a catalogue recipe for it if one exists; otherwise write that dish yourself as ")
+                    .append("a newRecipe and put it first. Do not swap it for a different dish. You may add up to 2 ")
+                    .append("variations of it (e.g. a cheese omelette and a vegetable omelette).")
+                    .append("\nIf it is a general wish (\"something light\", \"quick and spicy\"), pick the catalogue ")
+                    .append("recipes that fit it best, and write new ones only if fewer than 3 fit well.")
+                    .append("\nThe strict rules and filters still apply: if the dish breaks one (e.g. an egg allergy), ")
+                    .append("don't write it; pick the closest safe recipes and say why in the reason.");
         }
-        String goal = "Recommend up to " + MAX_PICKS + " recipes from the catalogue that match the user's filters. "
+        String goal = "Recommend up to " + MAX_PICKS + " recipes that match the user's filters, from the catalogue when it has them. "
                 + "Use search_recipe_catalog with the filters below, and say in each reason why the recipe fits.";
         return new AgentTask(goal, context.toString(), TOOLS, OUTPUT_FORMAT, profile);
     }

@@ -16,6 +16,7 @@ import mealplanner.agent.tools.SearchLibraryTool;
 import mealplanner.agent.tools.ToolManager;
 import mealplanner.agent.workflows.DaySummaryWriter;
 import mealplanner.agent.workflows.DietGuideChat;
+import mealplanner.agent.workflows.IngredientChecker;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
@@ -235,6 +236,8 @@ public class AppContext {
                 nutritionService, daySummaryWriter);
         // Extra: the Diet Guide chat may search the catalogue for example recipes (same tools as F07).
         facade.setDietGuideChat(new DietGuideChat(llm, toolManager));
+        // Extra: unknown ingredient names (Pantry, Macro Generator) are checked with Claude before they are added.
+        facade.setIngredientChecker(new IngredientChecker(llm, promptBuilder, responseParser));
 
         // Observer: the pantry changing re-checks the calendar flags (UC01 *a, UC04 step 5).
         eventBus.subscribe(PantryChanged.class, mealCalendarService);

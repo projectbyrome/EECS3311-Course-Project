@@ -22,6 +22,7 @@ import mealplanner.domain.StapleStatus;
 import mealplanner.events.EventBus;
 import mealplanner.events.PantryChanged;
 import mealplanner.model.FinishResult;
+import mealplanner.model.IngredientCheck;
 import mealplanner.model.PantryStatusSummary;
 
 /**
@@ -146,6 +147,16 @@ public class PantryService {
             Ingredient ingredient = known.get();
             Quantity q = bought.getQuantity();
             Optional<PantryItem> existing = pantryRepository.findByIngredient(ingredient.getId());
+            if (bought.isStaple() && existing.isEmpty()) {
+                pantryRepository.save(PantryItem.staple(ingredient, StapleStatus.HAVE, LocalDate.now()));
+                moved++;
+                continue;
+            }
+            if (bought.isStaple() && !existing.get().isStaple()) {
+                merged++; // already tracked by amount: a staple item has no amount to add, so it stays as it is
+                moved++;
+                continue;
+            }
             if (existing.isPresent() && existing.get().isStaple()) {
                 existing.get().setStapleStatus(StapleStatus.HAVE); // a bought staple is back to "have"
                 pantryRepository.save(existing.get());
@@ -293,6 +304,24 @@ public class PantryService {
             return existing.get();
         }
         Ingredient ingredient = new Ingredient(0, cleanName, "Other", 0, 1.0);
+        ingredientRepository.save(ingredient);
+        return ingredient;
+    }
+
+    /**
+     * Adds a new ingredient with what Claude said about it (category, allergens, weights).
+     * If the (corrected) name is already known, that ingredient is returned and nothing changes.
+     */
+    public Ingredient addIngredient(IngredientCheck check) {
+        String cleanName = check == null || check.name == null ? "" : check.name.trim().toLowerCase(Locale.ROOT);
+        if (cleanName.isEmpty()) throw new InvalidInputException("Type an ingredient name first");
+        if (!check.food) throw new InvalidInputException("\"" + cleanName + "\" doesn't look like a food ingredient");
+        Optional<Ingredient> existing = ingredientRepository.findByName(cleanName);
+        if (existing.isPresent()) return existing.get();
+        double density = check.densityGPerMl > 0 ? check.densityGPerMl : 1.0;
+        Ingredient ingredient = new Ingredient(0, cleanName, check.category == null ? "Other" : check.category,
+                check.gramsPerPiece, density);
+        ingredient.getAllergenTags().addAll(check.allergens);
         ingredientRepository.save(ingredient);
         return ingredient;
     }

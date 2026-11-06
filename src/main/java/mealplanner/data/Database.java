@@ -159,6 +159,29 @@ public class Database {
     public static final String INGREDIENTS_JSON = "/data/ingredients.json";
     /** Path of the built-in recipe catalogue used by recommendations (F07). */
     public static final String CATALOG_JSON = "/data/recipe-catalog.json";
+    /** The clearer cooking steps for the bundled recipes, with the old text they replace. */
+    public static final String STEP_UPDATES_JSON = "/data/recipe-step-updates.json";
+
+    /**
+     * Gives an existing database the clearer cooking steps (times, heat, what to look for).
+     * A recipe is only changed while it still has the old bundled steps, so steps the user edited are kept.
+     * Catalogue recipes and library recipes (sample recipes or ones copied from the catalogue) are both updated.
+     */
+    private void updateRecipeSteps(Connection c, SeedLoader loader) throws SQLException {
+        try (PreparedStatement catalog = c.prepareStatement(
+                "UPDATE catalog_recipe SET instructions = ? WHERE name = ? AND instructions = ?");
+             PreparedStatement library = c.prepareStatement(
+                     "UPDATE recipe SET instructions = ? WHERE name = ? AND instructions = ?")) {
+            for (String[] update : loader.loadStepUpdates(STEP_UPDATES_JSON)) {
+                for (PreparedStatement ps : new PreparedStatement[] {catalog, library}) {
+                    ps.setString(1, update[2]);
+                    ps.setString(2, update[0]);
+                    ps.setString(3, update[1]);
+                    ps.executeUpdate();
+                }
+            }
+        }
+    }
 
     /**
      * Loads the bundled data. Ingredients are added with INSERT OR IGNORE on every start, so names added to
@@ -193,6 +216,8 @@ public class Database {
                         loader.loadCatalog(CATALOG_JSON, new SqliteIngredientRepository(this)));
                 c.commit();
             }
+            updateRecipeSteps(c, loader);
+            c.commit();
         } catch (SQLException e) {
             throw new DataAccessException("Cannot load the bundled data", e);
         }

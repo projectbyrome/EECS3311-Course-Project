@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import mealplanner.agent.workflows.DaySummaryWriter;
 import mealplanner.agent.workflows.DietGuideChat;
+import mealplanner.agent.workflows.IngredientChecker;
 import mealplanner.agent.workflows.MacroGenerator;
 import mealplanner.agent.workflows.RecipeRecommender;
 import mealplanner.agent.workflows.ShoppingListGenerator;
@@ -26,6 +27,7 @@ import mealplanner.domain.ValidationReport;
 import mealplanner.model.DietGuideReply;
 import mealplanner.model.DaySummary;
 import mealplanner.model.FinishResult;
+import mealplanner.model.IngredientCheck;
 import mealplanner.model.NutritionSelection;
 import mealplanner.model.PantryStatusSummary;
 import mealplanner.model.RecipeSelection;
@@ -42,7 +44,7 @@ import mealplanner.service.RecipeLibraryService;
 
 /**
  * Facade: the one entry point used by both the GUI views and the CLI commands.
- * One group of methods per feature, F01 to F10, and new feature: dietguide.
+ * One group of methods per feature, F01 to F10.
  */
 public class AppFacade {
 
@@ -59,6 +61,8 @@ public class AppFacade {
     private final DaySummaryWriter daySummaryWriter;
     /** Extra feature: the Diet Guide chat (set by AppContext after construction). */
     private DietGuideChat dietGuideChat;
+    /** Null until AppContext sets it; then unknown ingredient names are checked with Claude. */
+    private IngredientChecker ingredientChecker;
 
     /** F01-F05 only (used by the earlier tests); profile and recommendation calls then fail. */
     public AppFacade(MealCalendarService mealCalendarService, RecipeLibraryService recipeLibraryService,
@@ -148,6 +152,11 @@ public class AppFacade {
         return checklistService.addItem(checklistId, name, quantity);
     }
 
+    /** A staple shopping item: no amount. */
+    public ChecklistItem addChecklistStaple(long checklistId, String name) {
+        return checklistService.addStaple(checklistId, name);
+    }
+
     public void setItemChecked(long itemId, boolean checked) {
         checklistService.setChecked(itemId, checked);
     }
@@ -203,6 +212,24 @@ public class AppFacade {
     /** Adds a new ingredient name (e.g. ketchup) so it can be used in the pantry and elsewhere. */
     public Ingredient addIngredient(String name) {
         return pantryService.addIngredient(name);
+    }
+
+    /**
+     * Asks Claude about a name that isn't in the ingredient list yet (is it a food, its usual name, category,
+     * allergens). Without Claude, the typed name comes back unchecked.
+     */
+    public IngredientCheck checkIngredient(String name) {
+        return ingredientChecker == null ? IngredientCheck.unchecked(name) : ingredientChecker.check(name);
+    }
+
+    /** Adds the ingredient Claude checked, with its category, allergens and weights. */
+    public Ingredient addIngredient(IngredientCheck check) {
+        return pantryService.addIngredient(check);
+    }
+
+    /** Extra: set by AppContext, like the Diet Guide chat. */
+    public void setIngredientChecker(IngredientChecker checker) {
+        this.ingredientChecker = checker;
     }
 
     /** Adds a staple (no amount, only have / running low), or changes the status of one already there. */

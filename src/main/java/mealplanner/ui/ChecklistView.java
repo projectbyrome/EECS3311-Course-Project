@@ -49,17 +49,19 @@ import mealplanner.model.ShoppingDraft;
 
 /**
  * F02/F03 GUI (Shopping menu): checklists on the left, the selected checklist's items with tick boxes
- * on the right, plus Finish Shopping and Generate from meals.
+ * on the right, plus Finish Shopping and Generate from meals. Choosing "Staple" as the unit adds an item with
+ * no amount (ketchup, salt...); new names like ketchup are checked with Claude before they are added.
  * Rough draft: the layout is built in code; it can move to an .fxml file later.
  */
 public class ChecklistView extends BorderPane implements EventListener {
 
     private static final String NEW_CHECKLIST = "(new checklist)";
+    private static final String STAPLE = "Staple";
 
     private final AppFacade facade;
     private final ListView<Checklist> lists = new ListView<>();
     private final VBox itemsBox = new VBox(6);
-    /** Pantry status summary (information only). */
+    /** Pantry status summary */
     private final VBox missingGroup = new VBox(6);
     private final VBox lowGroup = new VBox(6);
     private static final Color MISSING_COLOUR = Color.web("#F58A8F");
@@ -67,7 +69,7 @@ public class ChecklistView extends BorderPane implements EventListener {
     private final Label title = new Label();
     private final TextField itemName = new TextField();
     private final TextField itemAmount = new TextField();
-    private final ComboBox<Unit> itemUnit = new ComboBox<>();
+    private final ComboBox<String> itemUnit = new ComboBox<>();
     private final Button generateButton = new Button("Generate from meals");
 
     public ChecklistView(AppFacade facade) {
@@ -91,8 +93,14 @@ public class ChecklistView extends BorderPane implements EventListener {
         itemName.setPromptText("Item, e.g. eggs");
         itemAmount.setPromptText("Amount");
         itemAmount.setPrefWidth(70);
-        itemUnit.getItems().setAll(Unit.values());
-        itemUnit.setValue(Unit.PIECE);
+        for (Unit u : Unit.values()) itemUnit.getItems().add(u.name());
+        itemUnit.getItems().add(STAPLE);
+        itemUnit.setValue(Unit.PIECE.name());
+        itemUnit.valueProperty().addListener((o, a, b) -> {
+            boolean staple = STAPLE.equals(b);
+            itemAmount.setDisable(staple); // a staple has no amount
+            if (staple) itemAmount.clear();
+        });
         Button add = new Button("Add item");
         add.setOnAction(e -> onAddItem());
         Button finish = new Button("Finish Shopping");
@@ -134,17 +142,34 @@ public class ChecklistView extends BorderPane implements EventListener {
             showError("Choose or create a checklist first.");
             return;
         }
-        run(() -> {
-            double amount;
-            try {
-                amount = Double.parseDouble(itemAmount.getText().trim());
-            } catch (NumberFormatException e) {
-                throw new InvalidInputException("Amount must be a number");
+        boolean staple = STAPLE.equals(itemUnit.getValue());
+        Quantity quantity;
+        try {
+            quantity = staple ? null : readQuantity();
+        } catch (AppException ex) {
+            showError(ex.getMessage());
+            return;
+        }
+        // a new name like ketchup is checked with Claude first, so Finish Shopping can put it in the pantry
+        NewIngredientDialog.ensureKnown(facade, itemName.getText(), this, name -> run(() -> {
+            if (staple) {
+                facade.addChecklistStaple(selected.getId(), name);
+            } else {
+                facade.addChecklistItem(selected.getId(), name, quantity);
             }
-            facade.addChecklistItem(selected.getId(), itemName.getText(), new Quantity(amount, itemUnit.getValue()));
             itemName.clear();
             itemAmount.clear();
-        });
+        }), this::showError);
+    }
+
+    private Quantity readQuantity() {
+        double amount;
+        try {
+            amount = Double.parseDouble(itemAmount.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException("Amount must be a number (or choose Staple as the unit)");
+        }
+        return new Quantity(amount, Unit.valueOf(itemUnit.getValue()));
     }
 
     /** Asks first, then deletes the selected checklist and its items. */
@@ -174,8 +199,37 @@ public class ChecklistView extends BorderPane implements EventListener {
     public void onFinishShopping() {
         Checklist selected = lists.getSelectionModel().getSelectedItem();
         if (selected == null) return;
+        // ticked items with names that aren't ingredients yet (from older lists) are checked with Claude first
+        List<ChecklistItem> unknown = selected.getItems().stream()
+                .filter(i -> i.isChecked() && !facade.isKnownIngredient(i.getName())).toList();
+        checkUnknown(selected.getId(), new ArrayList<>(unknown));
+    }
+
+    /** One unknown item at a time: Claude check, Yes/No, rename the item if Claude fixed the name, then finish. */
+    private void checkUnknown(long checklistId, List<ChecklistItem> left) {
+        if (left.isEmpty()) {
+            finish(checklistId);
+            return;
+        }
+        ChecklistItem item = left.remove(0);
+        NewIngredientDialog.ensureKnown(facade, item.getName(), this, name -> {
+            if (!name.equalsIgnoreCase(item.getName())) {
+                try { // "mayo" -> "mayonnaise": replace the item with the fixed name, still ticked
+                    facade.removeChecklistItem(item.getId());
+                    ChecklistItem fixed = item.isStaple() ? facade.addChecklistStaple(checklistId, name)
+                            : facade.addChecklistItem(checklistId, name, item.getQuantity());
+                    facade.setItemChecked(fixed.getId(), true);
+                } catch (AppException ex) {
+                    showError(ex.getMessage());
+                }
+            }
+            checkUnknown(checklistId, left);
+        }, this::showError, () -> checkUnknown(checklistId, left)); // on No: that item just stays on the list
+    }
+
+    private void finish(long checklistId) {
         try {
-            FinishResult result = facade.finishShopping(selected.getId());
+            FinishResult result = facade.finishShopping(checklistId);
             new Alert(Alert.AlertType.INFORMATION, result.toString()).showAndWait();
         } catch (AppException ex) {
             showError(ex.getMessage());
@@ -320,7 +374,7 @@ public class ChecklistView extends BorderPane implements EventListener {
         }
         title.setText(checklist.getName());
         for (ChecklistItem item : checklist.getItems()) {
-            CheckBox box = new CheckBox(item.getName() + "  " + item.getQuantity());
+            CheckBox box = new CheckBox(item.getName() + "  " + item.amountText());
             box.setSelected(item.isChecked());
             box.setOnAction(e -> onToggle(item));
             MenuItem remove = new MenuItem("Remove item");

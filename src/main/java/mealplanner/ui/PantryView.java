@@ -46,8 +46,8 @@ import mealplanner.service.PantryService;
 /**
  * F04 GUI (Pantry menu): the pantry as a table, a row to add an ingredient, and Edit / Remove buttons.
  * Items are listed A to Z, and an item with 0 left shows "Out of stock". Staples (salt, oil, spices) have no
- * amount, only Have / Running low: "Add as staple" adds one, and Edit changes its status. The All / Ingredient /
- * Staple filter above the table shows one type at a time.
+ * amount, only Have / Running low: "Add as staple" adds one, and Edit changes its status. The filter above the
+ * table shows All, one type (Ingredient / Staple), or Out of stock: ingredients with 0 left plus staples marked Running low.
  * Listens for PantryChanged, so Finish Shopping and the end-of-day update also refresh it.
  * Rough draft: the layout is built in code; it can move to an .fxml file later.
  */
@@ -58,7 +58,7 @@ public class PantryView extends BorderPane implements EventListener {
     private final TextField nameField = new TextField();
     private final TextField amountField = new TextField();
     private final ComboBox<Unit> unitBox = new ComboBox<>();
-    /** "All", "Ingredient" or "Staple". */
+    /** "All", "Ingredient", "Staple" or "Out of stock". */
     private String filter = "All";
 
     public PantryView(AppFacade facade) {
@@ -113,14 +113,23 @@ public class PantryView extends BorderPane implements EventListener {
         refresh();
     }
 
-    /** SD02 from the GUI: addPantryItem(name, quantity). Unknown names and bad amounts show a message. */
+    /**
+     * SD02 from the GUI: addPantryItem(name, quantity). Bad amounts show a message. A name that isn't in the
+     * ingredient list (e.g. ketchup) is checked with Claude first, and added if the user says yes.
+     */
     public void onAdd() {
         try {
-            if (!knownOrAdded(nameField.getText())) return;
-            facade.addPantryItem(nameField.getText(), readQuantity(amountField.getText(), unitBox.getValue()));
-            nameField.clear();
-            amountField.clear();
-            // the PantryChanged event refreshes the table
+            Quantity quantity = readQuantity(amountField.getText(), unitBox.getValue());
+            NewIngredientDialog.ensureKnown(facade, nameField.getText(), this, name -> {
+                try {
+                    facade.addPantryItem(name, quantity);
+                    nameField.clear();
+                    amountField.clear();
+                    // the PantryChanged event refreshes the table
+                } catch (AppException ex) {
+                    showError(ex.getMessage());
+                }
+            }, this::showError);
         } catch (AppException ex) {
             showError(ex.getMessage());
         }
@@ -128,33 +137,15 @@ public class PantryView extends BorderPane implements EventListener {
 
     /** A staple has no amount: only Have / Running low (the amount and unit boxes are ignored). */
     public void onAddStaple() {
-        try {
-            if (!knownOrAdded(nameField.getText())) return;
-            facade.addStaple(nameField.getText(), StapleStatus.HAVE);
-            nameField.clear();
-            amountField.clear();
-        } catch (AppException ex) {
-            showError(ex.getMessage());
-        }
-    }
-
-    /**
-     * A name that isn't in the ingredient list (e.g. ketchup) can be added to it after a yes/no question.
-     * Returns false if the user said no. A blank name goes through so the usual error is shown.
-     */
-    private boolean knownOrAdded(String name) {
-        if (name == null || name.isBlank() || facade.isKnownIngredient(name)) {
-            return true;
-        }
-        Alert ask = new Alert(Alert.AlertType.CONFIRMATION,
-                "\"" + name.trim() + "\" isn't a known ingredient yet. Add it to the ingredient list?",
-                ButtonType.YES, ButtonType.NO);
-        ask.setHeaderText("New ingredient");
-        if (ask.showAndWait().filter(b -> b == ButtonType.YES).isEmpty()) {
-            return false;
-        }
-        facade.addIngredient(name);
-        return true;
+        NewIngredientDialog.ensureKnown(facade, nameField.getText(), this, name -> {
+            try {
+                facade.addStaple(name, StapleStatus.HAVE);
+                nameField.clear();
+                amountField.clear();
+            } catch (AppException ex) {
+                showError(ex.getMessage());
+            }
+        }, this::showError);
     }
 
     public void onEdit(PantryItem item) {
@@ -219,17 +210,22 @@ public class PantryView extends BorderPane implements EventListener {
         table.getItems().setAll(facade.getPantry().stream().filter(this::shown).toList());
     }
 
-    /** The type filter: All, Ingredient (tracked amount) or Staple (have / running low). */
+    /**
+     * The filter: All, Ingredient (tracked amount), Staple (have / running low), or Out of stock (ingredients
+     * with 0 left, plus staples marked running low: everything that needs buying).
+     */
     private boolean shown(PantryItem item) {
         return switch (filter) {
             case "Ingredient" -> !item.isStaple();
             case "Staple" -> item.isStaple();
+            case "Out of stock" -> PantryService.isOutOfStock(item)
+                    || (item.isStaple() && item.getStapleStatus() == StapleStatus.RUNNING_LOW);
             default -> true;
         };
     }
 
     /**
-     * All / Ingredient / Staple as one rounded control; the chosen part is filled with the accent colour.
+     * All / Ingredient / Staple / Out of stock as one rounded control; the chosen part is filled with the accent colour.
      * Drawn with plain panes and Text (no style classes), so Theme leaves these colours alone.
      */
     private HBox segmentedFilter() {
@@ -239,7 +235,7 @@ public class PantryView extends BorderPane implements EventListener {
         control.setBorder(new Border(new BorderStroke(Theme.BORDER, BorderStrokeStyle.SOLID, new CornerRadii(12),
                 BorderWidths.DEFAULT)));
         control.setMaxWidth(Region.USE_PREF_SIZE);
-        for (String name : List.of("All", "Ingredient", "Staple")) {
+        for (String name : List.of("All", "Ingredient", "Staple", "Out of stock")) {
             Text label = new Text(name);
             label.setFont(Font.font("Inter SemiBold", 13));
             StackPane segment = new StackPane(label);
