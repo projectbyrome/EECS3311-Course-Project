@@ -26,7 +26,7 @@ public class SqliteProfileRepository implements ProfileRepository {
     public Optional<UserProfile> load() {
         try (Connection c = db.connection();
              PreparedStatement ps = c.prepareStatement("SELECT restrictions, allergies, favourite_categories, goal_calories, "
-                     + "goal_protein, goal_carbs, goal_fat FROM profile WHERE id = 1");
+                     + "goal_protein, goal_carbs, goal_fat, goal_fiber, goal_sodium FROM profile WHERE id = 1");
              ResultSet rs = ps.executeQuery()) {
             if (!rs.next()) {
                 return Optional.empty();
@@ -36,7 +36,8 @@ public class SqliteProfileRepository implements ProfileRepository {
                 restrictions.add(DietaryRestriction.valueOf(r));
             }
             NutritionGoal goal = new NutritionGoal(rs.getDouble("goal_calories"), rs.getDouble("goal_protein"),
-                    rs.getDouble("goal_carbs"), rs.getDouble("goal_fat"));
+                    rs.getDouble("goal_carbs"), rs.getDouble("goal_fat"), rs.getDouble("goal_fiber"),
+                    rs.getDouble("goal_sodium"));
             return Optional.of(new UserProfile(restrictions, new TreeSet<>(split(rs.getString("allergies"))),
                     new LinkedHashSet<>(lines(rs.getString("favourite_categories"))), goal));
         } catch (SQLException e) {
@@ -48,11 +49,12 @@ public class SqliteProfileRepository implements ProfileRepository {
     public void save(UserProfile p) {
         try (Connection c = db.connection();
              PreparedStatement ps = c.prepareStatement("INSERT INTO profile(id, restrictions, allergies, favourite_categories, "
-                     + "goal_calories, goal_protein, goal_carbs, goal_fat) VALUES(1,?,?,?,?,?,?,?) "
+                     + "goal_calories, goal_protein, goal_carbs, goal_fat, goal_fiber, goal_sodium) VALUES(1,?,?,?,?,?,?,?,?,?) "
                      + "ON CONFLICT(id) DO UPDATE SET restrictions = excluded.restrictions, "
                      + "allergies = excluded.allergies, favourite_categories = excluded.favourite_categories, "
                      + "goal_calories = excluded.goal_calories, goal_protein = excluded.goal_protein, "
-                     + "goal_carbs = excluded.goal_carbs, goal_fat = excluded.goal_fat")) {
+                     + "goal_carbs = excluded.goal_carbs, goal_fat = excluded.goal_fat, "
+                     + "goal_fiber = excluded.goal_fiber, goal_sodium = excluded.goal_sodium")) {
             ps.setString(1, String.join(",", p.getRestrictions().stream().map(Enum::name).sorted().toList()));
             ps.setString(2, String.join(",", new TreeSet<>(p.getAllergies())));
             ps.setString(3, String.join("\n", p.getFavouriteCategories())); // one per line, like recipe categories
@@ -60,6 +62,8 @@ public class SqliteProfileRepository implements ProfileRepository {
             ps.setDouble(5, p.getDefaultGoal().getProteinG());
             ps.setDouble(6, p.getDefaultGoal().getCarbsG());
             ps.setDouble(7, p.getDefaultGoal().getFatG());
+            ps.setDouble(8, p.getDefaultGoal().getFiberG());
+            ps.setDouble(9, p.getDefaultGoal().getSodiumMg());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("Cannot save the profile", e);

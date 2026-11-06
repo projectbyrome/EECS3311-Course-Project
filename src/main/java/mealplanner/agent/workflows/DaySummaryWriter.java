@@ -23,7 +23,9 @@ public class DaySummaryWriter {
     private static final String INSTRUCTIONS = """
             You are the nutrition coach inside a meal-planning app.
             You get the totals of the meals a user planned for one day and their daily goals.
-            Protein is a minimum; calories, carbohydrates and fat are maximums. A goal of 0 means no goal.
+            Protein and fibre are minimums; calories, carbohydrates, fat and sodium are maximums. A goal of 0 means
+            no goal. If fibre or sodium has no goal, you may still mention it when fibre is well under about 25 g
+            or sodium is over about 2300 mg for the day ("n/a" means unknown; don't mention those).
             Write 2 to 4 short sentences (under 80 words): say how well the day meets the goals,
             then give one or two concrete suggestions (a food to add, swap or reduce).
             Only use the numbers you are given. If the totals are marked incomplete, say the real totals are higher.
@@ -58,6 +60,8 @@ public class DaySummaryWriter {
         sb.append(String.format("- Carbohydrates: %.1f g%n", totals.getCarbsG()));
         sb.append(String.format("- Fat: %.1f g%n", totals.getFatG()));
         sb.append(String.format("- Sugar: %.1f g%n", totals.getSugarG()));
+        sb.append("- Fibre: ").append(totals.fiberText()).append(String.format("%n"));
+        sb.append("- Sodium: ").append(totals.sodiumText()).append(String.format("%n"));
         totals.getVitamins().entrySet().stream().sorted(Map.Entry.comparingByKey())
                 .forEach(e -> sb.append(String.format("- %s: %.2f%n", e.getKey(), e.getValue())));
         sb.append(totals.isComplete() ? "Data: complete\n" : "Data: INCOMPLETE (some ingredients have no nutrition data)\n");
@@ -66,6 +70,8 @@ public class DaySummaryWriter {
         sb.append(String.format("- Protein: min %.0f g%n", goal.getProteinG()));
         sb.append(String.format("- Carbohydrates: max %.0f g%n", goal.getCarbsG()));
         sb.append(String.format("- Fat: max %.0f g%n", goal.getFatG()));
+        sb.append(String.format("- Fibre: min %.0f g%n", goal.getFiberG()));
+        sb.append(String.format("- Sodium: max %.0f mg%n", goal.getSodiumMg()));
         List<String> misses = goal.misses(totals, NutritionGoal.DAILY_TOLERANCE_PCT);
         sb.append(String.format("%nGoal check (%.0f%% tolerance): ", NutritionGoal.DAILY_TOLERANCE_PCT));
         sb.append(misses.isEmpty() ? "all goals met" : "not met: " + String.join("; ", misses));

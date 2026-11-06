@@ -95,7 +95,7 @@ public class SeedLoader {
 
     /**
      * The built-in recipe catalogue for recommendations (F07). Same format as the sample recipes, plus
-     * "nutritionPerServing": {"calories": .., "carbsG": .., "proteinG": .., "fatG": .., "sugarG": ..}.
+     * "nutritionPerServing": {"calories": .., "carbsG": .., "proteinG": .., "fatG": .., "sugarG": .., "sodiumMg": .., "fiberG": ..}.
      * Unlike the sample recipes, an unknown ingredient is an error: the catalogue ships with the app.
      */
     public List<Recipe> loadCatalog(String path, IngredientRepository ingredients) {
@@ -118,6 +118,7 @@ public class SeedLoader {
             if (nut.isObject()) {
                 r.setNutrition(new NutritionSummary(nut.path("calories").asDouble(), nut.path("carbsG").asDouble(),
                         nut.path("proteinG").asDouble(), nut.path("fatG").asDouble(), nut.path("sugarG").asDouble(),
+                        nut.path("sodiumMg").asDouble(Double.NaN), nut.path("fiberG").asDouble(Double.NaN),
                         Map.of(), true, List.of()));
             }
             list.add(r);

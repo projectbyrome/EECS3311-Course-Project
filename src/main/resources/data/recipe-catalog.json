@@ -2,15 +2,56 @@
   {
     "name": "Spaghetti Pomodoro",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Boiled", "Pan-Fried"], "DISH_TYPE": ["Pasta"], "FLAVOR": ["Savory", "Garlicky", "Herbal"], "MAIN_INGREDIENT": ["Pasta", "Vegetables"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Boiled",
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Pasta"
+      ],
+      "FLAVOR": [
+        "Savory",
+        "Garlicky",
+        "Herbal"
+      ],
+      "MAIN_INGREDIENT": [
+        "Pasta",
+        "Vegetables"
+      ]
+    },
     "cookMinutes": 25,
     "ingredients": [
-      {"name": "pasta", "amount": 200, "unit": "G"},
-      {"name": "canned tomatoes", "amount": 400, "unit": "G"},
-      {"name": "garlic", "amount": 2, "unit": "PIECE"},
-      {"name": "olive oil", "amount": 2, "unit": "TBSP"},
-      {"name": "basil", "amount": 10, "unit": "G"},
-      {"name": "parmesan cheese", "amount": 30, "unit": "G"}
+      {
+        "name": "pasta",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "garlic",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "olive oil",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "basil",
+        "amount": 10,
+        "unit": "G"
+      },
+      {
+        "name": "parmesan cheese",
+        "amount": 30,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Bring a large pot of salted water to a boil over high heat, add the pasta and cook for about 9-11 minutes (or the time on the packet), stirring now and then, until tender but still slightly firm to the bite (al dente). Drain.",
@@ -18,41 +59,141 @@
       "Add the tomatoes and simmer for 10 minutes over medium-low heat, stirring now and then, until the sauce has thickened slightly.",
       "Take off the heat and toss with the pasta, basil and parmesan until the pasta is evenly coated."
     ],
-    "nutritionPerServing": {"calories": 627, "carbsG": 91.4, "proteinG": 22.4, "fatG": 20.0, "sugarG": 11.7}
+    "nutritionPerServing": {
+      "calories": 627,
+      "carbsG": 91.4,
+      "proteinG": 22.4,
+      "fatG": 20.0,
+      "sugarG": 11.7,
+      "sodiumMg": 507,
+      "fiberG": 7.2
+    }
   },
   {
     "name": "Chicken Parmesan Pasta",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Pan-Fried", "Boiled"], "DISH_TYPE": ["Pasta"], "FLAVOR": ["Savory", "Cheesy", "Rich"], "MAIN_INGREDIENT": ["Poultry", "Pasta", "Cheese"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried",
+        "Boiled"
+      ],
+      "DISH_TYPE": [
+        "Pasta"
+      ],
+      "FLAVOR": [
+        "Savory",
+        "Cheesy",
+        "Rich"
+      ],
+      "MAIN_INGREDIENT": [
+        "Poultry",
+        "Pasta",
+        "Cheese"
+      ]
+    },
     "cookMinutes": 30,
     "ingredients": [
-      {"name": "chicken breast", "amount": 300, "unit": "G"},
-      {"name": "pasta", "amount": 160, "unit": "G"},
-      {"name": "canned tomatoes", "amount": 200, "unit": "G"},
-      {"name": "parmesan cheese", "amount": 40, "unit": "G"},
-      {"name": "mozzarella cheese", "amount": 60, "unit": "G"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "chicken breast",
+        "amount": 300,
+        "unit": "G"
+      },
+      {
+        "name": "pasta",
+        "amount": 160,
+        "unit": "G"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "parmesan cheese",
+        "amount": 40,
+        "unit": "G"
+      },
+      {
+        "name": "mozzarella cheese",
+        "amount": 60,
+        "unit": "G"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Cook the pasta in a large pot of salted boiling water over high heat for about 9-11 minutes (or the time on the packet), until al dente. Drain.",
       "Heat the oil in an oven-safe or lidded pan over medium-high heat and brown the chicken for about 4-5 minutes per side, until golden on both sides.",
-      "Add the tomatoes, lower the heat to medium-low and simmer for about 8-10 minutes, until the chicken is cooked through (no pink inside, 74 °C / 165 °F in the thickest part) and the sauce has thickened slightly.",
+      "Add the tomatoes, lower the heat to medium-low and simmer for about 8-10 minutes, until the chicken is cooked through (no pink inside, 74 \u00b0C / 165 \u00b0F in the thickest part) and the sauce has thickened slightly.",
       "Top with both cheeses, cover with a lid (or put under a hot broiler) for about 2-3 minutes, until the cheese has melted and is bubbling. Serve over the pasta."
     ],
-    "nutritionPerServing": {"calories": 738, "carbsG": 68.7, "proteinG": 61.8, "fatG": 23.0, "sugarG": 7.0}
+    "nutritionPerServing": {
+      "calories": 738,
+      "carbsG": 68.7,
+      "proteinG": 61.8,
+      "fatG": 23.0,
+      "sugarG": 7.0,
+      "sodiumMg": 711,
+      "fiberG": 4.5
+    }
   },
   {
     "name": "Garlic Shrimp Linguine",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Pan-Fried", "Boiled"], "DISH_TYPE": ["Pasta"], "FLAVOR": ["Garlicky", "Buttery", "Citrusy"], "MAIN_INGREDIENT": ["Shellfish", "Seafood", "Pasta"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried",
+        "Boiled"
+      ],
+      "DISH_TYPE": [
+        "Pasta"
+      ],
+      "FLAVOR": [
+        "Garlicky",
+        "Buttery",
+        "Citrusy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Shellfish",
+        "Seafood",
+        "Pasta"
+      ]
+    },
     "cookMinutes": 20,
     "ingredients": [
-      {"name": "shrimp", "amount": 250, "unit": "G"},
-      {"name": "pasta", "amount": 160, "unit": "G"},
-      {"name": "garlic", "amount": 3, "unit": "PIECE"},
-      {"name": "butter", "amount": 20, "unit": "G"},
-      {"name": "lemon", "amount": 1, "unit": "PIECE"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "shrimp",
+        "amount": 250,
+        "unit": "G"
+      },
+      {
+        "name": "pasta",
+        "amount": 160,
+        "unit": "G"
+      },
+      {
+        "name": "garlic",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "butter",
+        "amount": 20,
+        "unit": "G"
+      },
+      {
+        "name": "lemon",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Cook the pasta in a large pot of salted boiling water over high heat for about 9-11 minutes (or the time on the packet), until al dente. Drain.",
@@ -60,20 +201,69 @@
       "Add the shrimp and fry for about 2-3 minutes, turning once, until pink all over and just opaque in the middle (don't overcook or they turn rubbery).",
       "Take off the heat, add the lemon juice and toss with the pasta until coated."
     ],
-    "nutritionPerServing": {"calories": 554, "carbsG": 65.5, "proteinG": 36.3, "fatG": 16.8, "sugarG": 3.0}
+    "nutritionPerServing": {
+      "calories": 554,
+      "carbsG": 65.5,
+      "proteinG": 36.3,
+      "fatG": 16.8,
+      "sugarG": 3.0,
+      "sodiumMg": 221,
+      "fiberG": 3.6
+    }
   },
   {
     "name": "Mushroom Risotto",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Slow-Cooked"], "DISH_TYPE": ["Risotto", "Rice Dishes"], "FLAVOR": ["Creamy", "Earthy", "Cheesy"], "MAIN_INGREDIENT": ["Mushrooms", "Rice"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Slow-Cooked"
+      ],
+      "DISH_TYPE": [
+        "Risotto",
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Creamy",
+        "Earthy",
+        "Cheesy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Mushrooms",
+        "Rice"
+      ]
+    },
     "cookMinutes": 40,
     "ingredients": [
-      {"name": "white rice", "amount": 160, "unit": "G"},
-      {"name": "mushrooms", "amount": 200, "unit": "G"},
-      {"name": "onion", "amount": 1, "unit": "PIECE"},
-      {"name": "butter", "amount": 20, "unit": "G"},
-      {"name": "parmesan cheese", "amount": 30, "unit": "G"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "white rice",
+        "amount": 160,
+        "unit": "G"
+      },
+      {
+        "name": "mushrooms",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "onion",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "butter",
+        "amount": 20,
+        "unit": "G"
+      },
+      {
+        "name": "parmesan cheese",
+        "amount": 30,
+        "unit": "G"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Heat the oil in a wide pan over medium heat and soften the onion and mushrooms for about 6-8 minutes, stirring, until the onion is soft and see-through and the mushrooms have released their liquid and browned lightly.",
@@ -81,59 +271,203 @@
       "Add hot stock a ladle at a time, stirring, for 20 minutes over medium-low heat, waiting until each ladle is almost absorbed before adding the next, until the rice is creamy and tender with a slight bite.",
       "Take off the heat and stir in the butter and parmesan until melted and glossy. Rest for about 1-2 minutes before serving."
     ],
-    "nutritionPerServing": {"calories": 532, "carbsG": 73.0, "proteinG": 15.2, "fatG": 20.1, "sugarG": 4.5}
+    "nutritionPerServing": {
+      "calories": 532,
+      "carbsG": 73.0,
+      "proteinG": 15.2,
+      "fatG": 20.1,
+      "sugarG": 4.5,
+      "sodiumMg": 315,
+      "fiberG": 3.0
+    }
   },
   {
     "name": "Caprese Salad",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Raw"], "DISH_TYPE": ["Salad"], "FLAVOR": ["Herbal", "Mild", "Fruity"], "MAIN_INGREDIENT": ["Cheese", "Vegetables", "Herbs"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Raw"
+      ],
+      "DISH_TYPE": [
+        "Salad"
+      ],
+      "FLAVOR": [
+        "Herbal",
+        "Mild",
+        "Fruity"
+      ],
+      "MAIN_INGREDIENT": [
+        "Cheese",
+        "Vegetables",
+        "Herbs"
+      ]
+    },
     "cookMinutes": 10,
     "ingredients": [
-      {"name": "tomato", "amount": 2, "unit": "PIECE"},
-      {"name": "mozzarella cheese", "amount": 125, "unit": "G"},
-      {"name": "basil", "amount": 10, "unit": "G"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "tomato",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "mozzarella cheese",
+        "amount": 125,
+        "unit": "G"
+      },
+      {
+        "name": "basil",
+        "amount": 10,
+        "unit": "G"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Slice the tomatoes and mozzarella into rounds about 1 cm (1/2 inch) thick.",
       "Layer them on a plate, alternating tomato and mozzarella, with basil leaves in between, and drizzle with olive oil."
     ],
-    "nutritionPerServing": {"calories": 257, "carbsG": 6.7, "proteinG": 18.7, "fatG": 17.6, "sugarG": 3.8}
+    "nutritionPerServing": {
+      "calories": 257,
+      "carbsG": 6.7,
+      "proteinG": 18.7,
+      "fatG": 17.6,
+      "sugarG": 3.8,
+      "sodiumMg": 400,
+      "fiberG": 1.5
+    }
   },
   {
     "name": "Chicken Burrito Bowl",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Pan-Fried"], "DISH_TYPE": ["Bowls", "Rice Dishes"], "FLAVOR": ["Spicy", "Savory", "Citrusy"], "MAIN_INGREDIENT": ["Poultry", "Rice", "Beans"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Bowls",
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Savory",
+        "Citrusy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Poultry",
+        "Rice",
+        "Beans"
+      ]
+    },
     "cookMinutes": 25,
     "ingredients": [
-      {"name": "chicken breast", "amount": 250, "unit": "G"},
-      {"name": "white rice", "amount": 120, "unit": "G"},
-      {"name": "black beans", "amount": 200, "unit": "G"},
-      {"name": "bell pepper", "amount": 1, "unit": "PIECE"},
-      {"name": "avocado", "amount": 1, "unit": "PIECE"},
-      {"name": "lime", "amount": 1, "unit": "PIECE"},
-      {"name": "chili powder", "amount": 1, "unit": "TSP"}
+      {
+        "name": "chicken breast",
+        "amount": 250,
+        "unit": "G"
+      },
+      {
+        "name": "white rice",
+        "amount": 120,
+        "unit": "G"
+      },
+      {
+        "name": "black beans",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "bell pepper",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "avocado",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "lime",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "chili powder",
+        "amount": 1,
+        "unit": "TSP"
+      }
     ],
     "instructions": [
       "Rinse the rice, then simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until the water is absorbed and the rice is tender. Rest it covered for about 5 minutes off the heat.",
-      "Season the chicken with chili powder. Cook it with the pepper in a pan over medium-high heat for about 6-8 minutes per side, until the chicken is golden and cooked through (no pink inside, 74 °C / 165 °F) and the pepper is soft.",
+      "Season the chicken with chili powder. Cook it with the pepper in a pan over medium-high heat for about 6-8 minutes per side, until the chicken is golden and cooked through (no pink inside, 74 \u00b0C / 165 \u00b0F) and the pepper is soft.",
       "Warm the beans in a small pot over medium heat for about 3-4 minutes, until hot.",
       "Slice the chicken and serve on the rice with the pepper, beans, avocado and a squeeze of lime."
     ],
-    "nutritionPerServing": {"calories": 616, "carbsG": 78.9, "proteinG": 41.0, "fatG": 15.5, "sugarG": 4.7}
+    "nutritionPerServing": {
+      "calories": 616,
+      "carbsG": 78.9,
+      "proteinG": 41.0,
+      "fatG": 15.5,
+      "sugarG": 4.7,
+      "sodiumMg": 321,
+      "fiberG": 15.7
+    }
   },
   {
     "name": "Black Bean Tacos",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Raw"], "DISH_TYPE": ["Taco"], "FLAVOR": ["Tangy", "Savory", "Citrusy"], "MAIN_INGREDIENT": ["Beans", "Legumes", "Vegetables"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Raw"
+      ],
+      "DISH_TYPE": [
+        "Taco"
+      ],
+      "FLAVOR": [
+        "Tangy",
+        "Savory",
+        "Citrusy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Beans",
+        "Legumes",
+        "Vegetables"
+      ]
+    },
     "cookMinutes": 15,
     "ingredients": [
-      {"name": "tortilla", "amount": 4, "unit": "PIECE"},
-      {"name": "black beans", "amount": 240, "unit": "G"},
-      {"name": "avocado", "amount": 1, "unit": "PIECE"},
-      {"name": "tomato", "amount": 1, "unit": "PIECE"},
-      {"name": "lettuce", "amount": 40, "unit": "G"},
-      {"name": "lime", "amount": 1, "unit": "PIECE"}
+      {
+        "name": "tortilla",
+        "amount": 4,
+        "unit": "PIECE"
+      },
+      {
+        "name": "black beans",
+        "amount": 240,
+        "unit": "G"
+      },
+      {
+        "name": "avocado",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "tomato",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "lettuce",
+        "amount": 40,
+        "unit": "G"
+      },
+      {
+        "name": "lime",
+        "amount": 1,
+        "unit": "PIECE"
+      }
     ],
     "instructions": [
       "Warm the beans in a small pot over medium heat for about 3-5 minutes, stirring, until hot all the way through.",
@@ -141,64 +475,226 @@
       "Fill with the beans, avocado, tomato and lettuce.",
       "Squeeze lime over just before serving."
     ],
-    "nutritionPerServing": {"calories": 534, "carbsG": 78.7, "proteinG": 16.9, "fatG": 18.4, "sugarG": 5.0}
+    "nutritionPerServing": {
+      "calories": 534,
+      "carbsG": 78.7,
+      "proteinG": 16.9,
+      "fatG": 18.4,
+      "sugarG": 5.0,
+      "sodiumMg": 842,
+      "fiberG": 17.5
+    }
   },
   {
     "name": "Beef Chili",
     "servings": 4,
-    "categories": {"COOKING_METHOD": ["Stewed", "Slow-Cooked"], "DISH_TYPE": ["Stew"], "FLAVOR": ["Spicy", "Savory", "Rich"], "MAIN_INGREDIENT": ["Meat", "Beans"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stewed",
+        "Slow-Cooked"
+      ],
+      "DISH_TYPE": [
+        "Stew"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Savory",
+        "Rich"
+      ],
+      "MAIN_INGREDIENT": [
+        "Meat",
+        "Beans"
+      ]
+    },
     "cookMinutes": 45,
     "ingredients": [
-      {"name": "ground beef", "amount": 500, "unit": "G"},
-      {"name": "kidney beans", "amount": 400, "unit": "G"},
-      {"name": "canned tomatoes", "amount": 400, "unit": "G"},
-      {"name": "onion", "amount": 1, "unit": "PIECE"},
-      {"name": "bell pepper", "amount": 1, "unit": "PIECE"},
-      {"name": "chili powder", "amount": 2, "unit": "TBSP"}
+      {
+        "name": "ground beef",
+        "amount": 500,
+        "unit": "G"
+      },
+      {
+        "name": "kidney beans",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "onion",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "bell pepper",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "chili powder",
+        "amount": 2,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Brown the beef with the onion and pepper in a large pot over medium-high heat for about 8-10 minutes, breaking up the meat, until no pink is left and the onion is soft.",
       "Add the chili powder and stir for about 1 minute until fragrant, then add the tomatoes and beans.",
       "Bring to a boil, then simmer 30 minutes over low heat, stirring now and then, until thickened and the flavours have come together."
     ],
-    "nutritionPerServing": {"calories": 466, "carbsG": 28.7, "proteinG": 29.5, "fatG": 26.5, "sugarG": 7.7}
+    "nutritionPerServing": {
+      "calories": 466,
+      "carbsG": 28.7,
+      "proteinG": 29.5,
+      "fatG": 26.5,
+      "sugarG": 7.7,
+      "sodiumMg": 518,
+      "fiberG": 10.9
+    }
   },
   {
     "name": "Chickpea Curry",
     "servings": 3,
-    "categories": {"COOKING_METHOD": ["Stewed"], "DISH_TYPE": ["Curry"], "FLAVOR": ["Spicy", "Creamy", "Earthy"], "MAIN_INGREDIENT": ["Legumes", "Vegetables"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stewed"
+      ],
+      "DISH_TYPE": [
+        "Curry"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Creamy",
+        "Earthy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Legumes",
+        "Vegetables"
+      ]
+    },
     "cookMinutes": 30,
     "ingredients": [
-      {"name": "chickpeas", "amount": 400, "unit": "G"},
-      {"name": "coconut milk", "amount": 400, "unit": "ML"},
-      {"name": "onion", "amount": 1, "unit": "PIECE"},
-      {"name": "garlic", "amount": 2, "unit": "PIECE"},
-      {"name": "ginger", "amount": 15, "unit": "G"},
-      {"name": "curry powder", "amount": 2, "unit": "TBSP"},
-      {"name": "spinach", "amount": 100, "unit": "G"},
-      {"name": "canned tomatoes", "amount": 200, "unit": "G"}
+      {
+        "name": "chickpeas",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "coconut milk",
+        "amount": 400,
+        "unit": "ML"
+      },
+      {
+        "name": "onion",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "garlic",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "ginger",
+        "amount": 15,
+        "unit": "G"
+      },
+      {
+        "name": "curry powder",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "spinach",
+        "amount": 100,
+        "unit": "G"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 200,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Fry the onion in a pan over medium heat for about 5-7 minutes, until soft and golden at the edges, then add the garlic and ginger and fry for about 1 minute, until fragrant.",
       "Add the curry powder and stir for about 30 seconds, then add the tomatoes, coconut milk and chickpeas; simmer 15 minutes over medium-low heat, until slightly thickened.",
       "Stir in the spinach for about 1-2 minutes, until just wilted."
     ],
-    "nutritionPerServing": {"calories": 548, "carbsG": 52.0, "proteinG": 15.6, "fatG": 35.5, "sugarG": 14.4}
+    "nutritionPerServing": {
+      "calories": 548,
+      "carbsG": 52.0,
+      "proteinG": 15.6,
+      "fatG": 35.5,
+      "sugarG": 14.4,
+      "sodiumMg": 470,
+      "fiberG": 17.1
+    }
   },
   {
     "name": "Chicken Curry with Rice",
     "servings": 3,
-    "categories": {"COOKING_METHOD": ["Stewed"], "DISH_TYPE": ["Curry", "Rice Dishes"], "FLAVOR": ["Spicy", "Creamy", "Savory"], "MAIN_INGREDIENT": ["Poultry", "Rice"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stewed"
+      ],
+      "DISH_TYPE": [
+        "Curry",
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Creamy",
+        "Savory"
+      ],
+      "MAIN_INGREDIENT": [
+        "Poultry",
+        "Rice"
+      ]
+    },
     "cookMinutes": 40,
     "ingredients": [
-      {"name": "chicken breast", "amount": 450, "unit": "G"},
-      {"name": "plain yogurt", "amount": 150, "unit": "G"},
-      {"name": "onion", "amount": 1, "unit": "PIECE"},
-      {"name": "garlic", "amount": 3, "unit": "PIECE"},
-      {"name": "ginger", "amount": 15, "unit": "G"},
-      {"name": "curry powder", "amount": 2, "unit": "TBSP"},
-      {"name": "canned tomatoes", "amount": 400, "unit": "G"},
-      {"name": "white rice", "amount": 180, "unit": "G"}
+      {
+        "name": "chicken breast",
+        "amount": 450,
+        "unit": "G"
+      },
+      {
+        "name": "plain yogurt",
+        "amount": 150,
+        "unit": "G"
+      },
+      {
+        "name": "onion",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "garlic",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "ginger",
+        "amount": 15,
+        "unit": "G"
+      },
+      {
+        "name": "curry powder",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "canned tomatoes",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "white rice",
+        "amount": 180,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Marinate the chicken in the yogurt and curry powder for at least about 20 minutes (or up to overnight in the fridge).",
@@ -206,20 +702,69 @@
       "Fry the onion in a pan over medium heat for about 5-7 minutes until soft and golden, add the garlic and ginger for about 1 minute until fragrant, then add the chicken and fry for about 3-4 minutes until sealed on all sides. Add the tomatoes.",
       "Simmer 20 minutes over medium-low heat, until the chicken is cooked through (no pink inside) and the sauce has thickened, and serve with the rice."
     ],
-    "nutritionPerServing": {"calories": 511, "carbsG": 67.9, "proteinG": 43.3, "fatG": 7.0, "sugarG": 10.1}
+    "nutritionPerServing": {
+      "calories": 511,
+      "carbsG": 67.9,
+      "proteinG": 43.3,
+      "fatG": 7.0,
+      "sugarG": 10.1,
+      "sodiumMg": 272,
+      "fiberG": 6.3
+    }
   },
   {
     "name": "Teriyaki Salmon",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Pan-Fried"], "DISH_TYPE": ["Rice Dishes"], "FLAVOR": ["Sweet", "Umami", "Salty"], "MAIN_INGREDIENT": ["Fish", "Seafood", "Rice"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Sweet",
+        "Umami",
+        "Salty"
+      ],
+      "MAIN_INGREDIENT": [
+        "Fish",
+        "Seafood",
+        "Rice"
+      ]
+    },
     "cookMinutes": 20,
     "ingredients": [
-      {"name": "salmon fillet", "amount": 2, "unit": "PIECE"},
-      {"name": "soy sauce", "amount": 3, "unit": "TBSP"},
-      {"name": "honey", "amount": 1, "unit": "TBSP"},
-      {"name": "ginger", "amount": 10, "unit": "G"},
-      {"name": "white rice", "amount": 150, "unit": "G"},
-      {"name": "broccoli", "amount": 200, "unit": "G"}
+      {
+        "name": "salmon fillet",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "soy sauce",
+        "amount": 3,
+        "unit": "TBSP"
+      },
+      {
+        "name": "honey",
+        "amount": 1,
+        "unit": "TBSP"
+      },
+      {
+        "name": "ginger",
+        "amount": 10,
+        "unit": "G"
+      },
+      {
+        "name": "white rice",
+        "amount": 150,
+        "unit": "G"
+      },
+      {
+        "name": "broccoli",
+        "amount": 200,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Mix the soy sauce, honey and ginger.",
@@ -228,182 +773,621 @@
       "Lower the heat to medium, pour in the sauce and glaze the salmon for about 1 minute, spooning it over, until the sauce is sticky and glossy.",
       "Serve with the rice and steamed broccoli."
     ],
-    "nutritionPerServing": {"calories": 711, "carbsG": 77.4, "proteinG": 44.3, "fatG": 23.2, "sugarG": 10.6}
+    "nutritionPerServing": {
+      "calories": 711,
+      "carbsG": 77.4,
+      "proteinG": 44.3,
+      "fatG": 23.2,
+      "sugarG": 10.6,
+      "sodiumMg": 1546,
+      "fiberG": 3.9
+    }
   },
   {
     "name": "Tofu Stir-fry",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Stir-Fried"], "DISH_TYPE": ["Rice Dishes"], "FLAVOR": ["Umami", "Savory", "Garlicky"], "MAIN_INGREDIENT": ["Tofu", "Soy Products", "Vegetables"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stir-Fried"
+      ],
+      "DISH_TYPE": [
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Umami",
+        "Savory",
+        "Garlicky"
+      ],
+      "MAIN_INGREDIENT": [
+        "Tofu",
+        "Soy Products",
+        "Vegetables"
+      ]
+    },
     "cookMinutes": 20,
     "ingredients": [
-      {"name": "tofu", "amount": 300, "unit": "G"},
-      {"name": "broccoli", "amount": 200, "unit": "G"},
-      {"name": "bell pepper", "amount": 1, "unit": "PIECE"},
-      {"name": "soy sauce", "amount": 2, "unit": "TBSP"},
-      {"name": "sesame oil", "amount": 1, "unit": "TBSP"},
-      {"name": "garlic", "amount": 2, "unit": "PIECE"},
-      {"name": "white rice", "amount": 150, "unit": "G"}
+      {
+        "name": "tofu",
+        "amount": 300,
+        "unit": "G"
+      },
+      {
+        "name": "broccoli",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "bell pepper",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "soy sauce",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "sesame oil",
+        "amount": 1,
+        "unit": "TBSP"
+      },
+      {
+        "name": "garlic",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "white rice",
+        "amount": 150,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Cook the rice: simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until tender.",
       "Fry the tofu in the sesame oil over medium-high heat for about 6-8 minutes, turning, until golden on all sides.",
       "Add the vegetables, garlic and soy sauce and stir-fry 5 minutes over high heat, until the broccoli is bright green and tender-crisp."
     ],
-    "nutritionPerServing": {"calories": 522, "carbsG": 76.4, "proteinG": 22.6, "fatG": 15.3, "sugarG": 5.9}
+    "nutritionPerServing": {
+      "calories": 522,
+      "carbsG": 76.4,
+      "proteinG": 22.6,
+      "fatG": 15.3,
+      "sugarG": 5.9,
+      "sodiumMg": 1004,
+      "fiberG": 6.9
+    }
   },
   {
     "name": "Egg Fried Rice",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Stir-Fried"], "DISH_TYPE": ["Rice Dishes"], "FLAVOR": ["Savory", "Umami", "Salty"], "MAIN_INGREDIENT": ["Rice", "Eggs"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stir-Fried"
+      ],
+      "DISH_TYPE": [
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Savory",
+        "Umami",
+        "Salty"
+      ],
+      "MAIN_INGREDIENT": [
+        "Rice",
+        "Eggs"
+      ]
+    },
     "cookMinutes": 15,
     "ingredients": [
-      {"name": "white rice", "amount": 150, "unit": "G"},
-      {"name": "eggs", "amount": 3, "unit": "PIECE"},
-      {"name": "green onion", "amount": 2, "unit": "PIECE"},
-      {"name": "soy sauce", "amount": 2, "unit": "TBSP"},
-      {"name": "sesame oil", "amount": 1, "unit": "TBSP"},
-      {"name": "carrot", "amount": 1, "unit": "PIECE"}
+      {
+        "name": "white rice",
+        "amount": 150,
+        "unit": "G"
+      },
+      {
+        "name": "eggs",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "green onion",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "soy sauce",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "sesame oil",
+        "amount": 1,
+        "unit": "TBSP"
+      },
+      {
+        "name": "carrot",
+        "amount": 1,
+        "unit": "PIECE"
+      }
     ],
     "instructions": [
       "Use cooked, cooled rice (cooked at least a few hours ahead, or the day before, so the grains are dry and separate).",
       "Scramble the eggs in the sesame oil over medium-high heat for about 1 minute, until just set. Add the carrot and stir-fry for about 2 minutes, then add the rice and stir-fry for about 3-4 minutes, until the rice is hot and starting to crisp.",
       "Season with soy sauce and green onion, tossing for about 30 seconds until evenly coloured."
     ],
-    "nutritionPerServing": {"calories": 467, "carbsG": 65.3, "proteinG": 16.7, "fatG": 14.6, "sugarG": 2.2}
+    "nutritionPerServing": {
+      "calories": 467,
+      "carbsG": 65.3,
+      "proteinG": 16.7,
+      "fatG": 14.6,
+      "sugarG": 2.2,
+      "sodiumMg": 1081,
+      "fiberG": 2.3
+    }
   },
   {
     "name": "Greek Salad",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Raw"], "DISH_TYPE": ["Salad"], "FLAVOR": ["Tangy", "Salty", "Citrusy"], "MAIN_INGREDIENT": ["Vegetables", "Cheese"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Raw"
+      ],
+      "DISH_TYPE": [
+        "Salad"
+      ],
+      "FLAVOR": [
+        "Tangy",
+        "Salty",
+        "Citrusy"
+      ],
+      "MAIN_INGREDIENT": [
+        "Vegetables",
+        "Cheese"
+      ]
+    },
     "cookMinutes": 10,
     "ingredients": [
-      {"name": "tomato", "amount": 2, "unit": "PIECE"},
-      {"name": "cucumber", "amount": 1, "unit": "PIECE"},
-      {"name": "feta cheese", "amount": 100, "unit": "G"},
-      {"name": "onion", "amount": 0.5, "unit": "PIECE"},
-      {"name": "olive oil", "amount": 2, "unit": "TBSP"},
-      {"name": "lemon", "amount": 0.5, "unit": "PIECE"}
+      {
+        "name": "tomato",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "cucumber",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "feta cheese",
+        "amount": 100,
+        "unit": "G"
+      },
+      {
+        "name": "onion",
+        "amount": 0.5,
+        "unit": "PIECE"
+      },
+      {
+        "name": "olive oil",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "lemon",
+        "amount": 0.5,
+        "unit": "PIECE"
+      }
     ],
     "instructions": [
       "Chop the vegetables into bite-size pieces.",
       "Top with feta, olive oil and lemon juice."
     ],
-    "nutritionPerServing": {"calories": 310, "carbsG": 16.0, "proteinG": 9.6, "fatG": 24.4, "sugarG": 9.2}
+    "nutritionPerServing": {
+      "calories": 310,
+      "carbsG": 16.0,
+      "proteinG": 9.6,
+      "fatG": 24.4,
+      "sugarG": 9.2,
+      "sodiumMg": 561,
+      "fiberG": 3.1
+    }
   },
   {
     "name": "Peanut Noodles",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Boiled"], "DISH_TYPE": ["Noodles"], "FLAVOR": ["Nutty", "Savory", "Sweet"], "MAIN_INGREDIENT": ["Noodles", "Nuts"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Boiled"
+      ],
+      "DISH_TYPE": [
+        "Noodles"
+      ],
+      "FLAVOR": [
+        "Nutty",
+        "Savory",
+        "Sweet"
+      ],
+      "MAIN_INGREDIENT": [
+        "Noodles",
+        "Nuts"
+      ]
+    },
     "cookMinutes": 20,
     "ingredients": [
-      {"name": "pasta", "amount": 160, "unit": "G"},
-      {"name": "peanut butter", "amount": 3, "unit": "TBSP"},
-      {"name": "soy sauce", "amount": 2, "unit": "TBSP"},
-      {"name": "lime", "amount": 1, "unit": "PIECE"},
-      {"name": "carrot", "amount": 1, "unit": "PIECE"},
-      {"name": "green onion", "amount": 2, "unit": "PIECE"}
+      {
+        "name": "pasta",
+        "amount": 160,
+        "unit": "G"
+      },
+      {
+        "name": "peanut butter",
+        "amount": 3,
+        "unit": "TBSP"
+      },
+      {
+        "name": "soy sauce",
+        "amount": 2,
+        "unit": "TBSP"
+      },
+      {
+        "name": "lime",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "carrot",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "green onion",
+        "amount": 2,
+        "unit": "PIECE"
+      }
     ],
     "instructions": [
       "Cook the noodles in salted boiling water over high heat for about 8-10 minutes (or the time on the packet), until tender. Drain and rinse briefly in cold water.",
       "Whisk the peanut butter, soy sauce and lime juice with a little water for about 1 minute, until smooth and pourable.",
       "Toss with the noodles, carrot and green onion until evenly coated."
     ],
-    "nutritionPerServing": {"calories": 475, "carbsG": 73.1, "proteinG": 18.6, "fatG": 13.5, "sugarG": 6.7}
+    "nutritionPerServing": {
+      "calories": 475,
+      "carbsG": 73.1,
+      "proteinG": 18.6,
+      "fatG": 13.5,
+      "sugarG": 6.7,
+      "sodiumMg": 1083,
+      "fiberG": 6.3
+    }
   },
   {
     "name": "Thai Shrimp Curry",
     "servings": 3,
-    "categories": {"COOKING_METHOD": ["Stewed"], "DISH_TYPE": ["Curry", "Rice Dishes"], "FLAVOR": ["Spicy", "Creamy", "Herbal"], "MAIN_INGREDIENT": ["Shellfish", "Seafood", "Rice"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Stewed"
+      ],
+      "DISH_TYPE": [
+        "Curry",
+        "Rice Dishes"
+      ],
+      "FLAVOR": [
+        "Spicy",
+        "Creamy",
+        "Herbal"
+      ],
+      "MAIN_INGREDIENT": [
+        "Shellfish",
+        "Seafood",
+        "Rice"
+      ]
+    },
     "cookMinutes": 30,
     "ingredients": [
-      {"name": "shrimp", "amount": 400, "unit": "G"},
-      {"name": "coconut milk", "amount": 400, "unit": "ML"},
-      {"name": "bell pepper", "amount": 1, "unit": "PIECE"},
-      {"name": "basil", "amount": 10, "unit": "G"},
-      {"name": "white rice", "amount": 180, "unit": "G"},
-      {"name": "lime", "amount": 1, "unit": "PIECE"},
-      {"name": "curry powder", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "shrimp",
+        "amount": 400,
+        "unit": "G"
+      },
+      {
+        "name": "coconut milk",
+        "amount": 400,
+        "unit": "ML"
+      },
+      {
+        "name": "bell pepper",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "basil",
+        "amount": 10,
+        "unit": "G"
+      },
+      {
+        "name": "white rice",
+        "amount": 180,
+        "unit": "G"
+      },
+      {
+        "name": "lime",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "curry powder",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Cook the rice: simmer it covered in about twice its volume of water over low heat for about 15-18 minutes, until tender.",
       "Simmer the coconut milk with the curry powder and the pepper over medium heat for about 5 minutes, until the pepper is soft.",
       "Add the shrimp for 4 minutes, until pink and opaque, then finish with basil and lime."
     ],
-    "nutritionPerServing": {"calories": 659, "carbsG": 62.5, "proteinG": 34.9, "fatG": 32.6, "sugarG": 6.9}
+    "nutritionPerServing": {
+      "calories": 659,
+      "carbsG": 62.5,
+      "proteinG": 34.9,
+      "fatG": 32.6,
+      "sugarG": 6.9,
+      "sodiumMg": 186,
+      "fiberG": 6.4
+    }
   },
   {
     "name": "Overnight Oats",
     "servings": 1,
-    "categories": {"COOKING_METHOD": ["Raw"], "DISH_TYPE": ["Porridge"], "FLAVOR": ["Sweet", "Creamy", "Nutty"], "MAIN_INGREDIENT": ["Grains", "Fruits", "Nuts"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Raw"
+      ],
+      "DISH_TYPE": [
+        "Porridge"
+      ],
+      "FLAVOR": [
+        "Sweet",
+        "Creamy",
+        "Nutty"
+      ],
+      "MAIN_INGREDIENT": [
+        "Grains",
+        "Fruits",
+        "Nuts"
+      ]
+    },
     "cookMinutes": 5,
     "ingredients": [
-      {"name": "rolled oats", "amount": 50, "unit": "G"},
-      {"name": "milk", "amount": 150, "unit": "ML"},
-      {"name": "banana", "amount": 1, "unit": "PIECE"},
-      {"name": "honey", "amount": 1, "unit": "TSP"},
-      {"name": "almonds", "amount": 15, "unit": "G"}
+      {
+        "name": "rolled oats",
+        "amount": 50,
+        "unit": "G"
+      },
+      {
+        "name": "milk",
+        "amount": 150,
+        "unit": "ML"
+      },
+      {
+        "name": "banana",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "honey",
+        "amount": 1,
+        "unit": "TSP"
+      },
+      {
+        "name": "almonds",
+        "amount": 15,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Mix the oats and milk and leave overnight in the fridge (at least about 6-8 hours), until the oats are soft and have absorbed most of the milk.",
       "Top with banana, honey and almonds."
     ],
-    "nutritionPerServing": {"calories": 499, "carbsG": 78.1, "proteinG": 15.9, "fatG": 16.2, "sugarG": 29.2}
+    "nutritionPerServing": {
+      "calories": 499,
+      "carbsG": 78.1,
+      "proteinG": 15.9,
+      "fatG": 16.2,
+      "sugarG": 29.2,
+      "sodiumMg": 71,
+      "fiberG": 10.0
+    }
   },
   {
     "name": "Quinoa Power Bowl",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Boiled"], "DISH_TYPE": ["Bowls", "Salad"], "FLAVOR": ["Citrusy", "Earthy", "Mild"], "MAIN_INGREDIENT": ["Grains", "Legumes", "Vegetables"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Boiled"
+      ],
+      "DISH_TYPE": [
+        "Bowls",
+        "Salad"
+      ],
+      "FLAVOR": [
+        "Citrusy",
+        "Earthy",
+        "Mild"
+      ],
+      "MAIN_INGREDIENT": [
+        "Grains",
+        "Legumes",
+        "Vegetables"
+      ]
+    },
     "cookMinutes": 25,
     "ingredients": [
-      {"name": "quinoa", "amount": 150, "unit": "G"},
-      {"name": "chickpeas", "amount": 200, "unit": "G"},
-      {"name": "spinach", "amount": 60, "unit": "G"},
-      {"name": "avocado", "amount": 1, "unit": "PIECE"},
-      {"name": "lemon", "amount": 1, "unit": "PIECE"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"}
+      {
+        "name": "quinoa",
+        "amount": 150,
+        "unit": "G"
+      },
+      {
+        "name": "chickpeas",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "spinach",
+        "amount": 60,
+        "unit": "G"
+      },
+      {
+        "name": "avocado",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "lemon",
+        "amount": 1,
+        "unit": "PIECE"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      }
     ],
     "instructions": [
       "Rinse the quinoa, then simmer it covered in about twice its volume of water over low heat for about 15 minutes, until the water is absorbed and the grains show a little curl. Rest covered for about 5 minutes and fluff with a fork.",
       "Toss with the chickpeas and spinach.",
       "Top with avocado, lemon juice and olive oil."
     ],
-    "nutritionPerServing": {"calories": 610, "carbsG": 81.2, "proteinG": 20.2, "fatG": 25.1, "sugarG": 5.4}
+    "nutritionPerServing": {
+      "calories": 610,
+      "carbsG": 81.2,
+      "proteinG": 20.2,
+      "fatG": 25.1,
+      "sugarG": 5.4,
+      "sodiumMg": 283,
+      "fiberG": 18.8
+    }
   },
   {
     "name": "Bacon and Eggs on Toast",
     "servings": 1,
-    "categories": {"COOKING_METHOD": ["Pan-Fried"], "DISH_TYPE": ["Sandwich"], "FLAVOR": ["Salty", "Savory", "Smoky"], "MAIN_INGREDIENT": ["Eggs", "Meat", "Bread"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried"
+      ],
+      "DISH_TYPE": [
+        "Sandwich"
+      ],
+      "FLAVOR": [
+        "Salty",
+        "Savory",
+        "Smoky"
+      ],
+      "MAIN_INGREDIENT": [
+        "Eggs",
+        "Meat",
+        "Bread"
+      ]
+    },
     "cookMinutes": 15,
     "ingredients": [
-      {"name": "eggs", "amount": 2, "unit": "PIECE"},
-      {"name": "bacon", "amount": 3, "unit": "PIECE"},
-      {"name": "bread", "amount": 2, "unit": "PIECE"},
-      {"name": "butter", "amount": 10, "unit": "G"}
+      {
+        "name": "eggs",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "bacon",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "bread",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "butter",
+        "amount": 10,
+        "unit": "G"
+      }
     ],
     "instructions": [
       "Fry the bacon in a pan over medium heat for about 6-8 minutes, turning once, until crisp. Drain on paper towel.",
       "Fry the eggs in the butter over medium-low heat for about 3-4 minutes, until the whites are set and the yolks are still runny (longer if you like them firm). Toast the bread for about 2-3 minutes, until golden.",
       "Serve the bacon and eggs on the toast."
     ],
-    "nutritionPerServing": {"calories": 617, "carbsG": 30.7, "proteinG": 34.7, "fatG": 38.4, "sugarG": 3.4}
+    "nutritionPerServing": {
+      "calories": 617,
+      "carbsG": 30.7,
+      "proteinG": 34.7,
+      "fatG": 38.4,
+      "sugarG": 3.4,
+      "sodiumMg": 872,
+      "fiberG": 1.6
+    }
   },
   {
     "name": "Pork Chops with Potatoes",
     "servings": 2,
-    "categories": {"COOKING_METHOD": ["Pan-Fried", "Roasted"], "DISH_TYPE": ["Platters"], "FLAVOR": ["Savory", "Garlicky"], "MAIN_INGREDIENT": ["Meat", "Roots and Tubers"]},
+    "categories": {
+      "COOKING_METHOD": [
+        "Pan-Fried",
+        "Roasted"
+      ],
+      "DISH_TYPE": [
+        "Platters"
+      ],
+      "FLAVOR": [
+        "Savory",
+        "Garlicky"
+      ],
+      "MAIN_INGREDIENT": [
+        "Meat",
+        "Roots and Tubers"
+      ]
+    },
     "cookMinutes": 40,
     "ingredients": [
-      {"name": "pork chop", "amount": 2, "unit": "PIECE"},
-      {"name": "potato", "amount": 3, "unit": "PIECE"},
-      {"name": "broccoli", "amount": 200, "unit": "G"},
-      {"name": "olive oil", "amount": 1, "unit": "TBSP"},
-      {"name": "garlic", "amount": 2, "unit": "PIECE"}
+      {
+        "name": "pork chop",
+        "amount": 2,
+        "unit": "PIECE"
+      },
+      {
+        "name": "potato",
+        "amount": 3,
+        "unit": "PIECE"
+      },
+      {
+        "name": "broccoli",
+        "amount": 200,
+        "unit": "G"
+      },
+      {
+        "name": "olive oil",
+        "amount": 1,
+        "unit": "TBSP"
+      },
+      {
+        "name": "garlic",
+        "amount": 2,
+        "unit": "PIECE"
+      }
     ],
     "instructions": [
-      "Heat the oven to 200 °C (400 °F). Cut the potatoes into chunks, toss with the oil and garlic and roast for 30 minutes, turning halfway, until golden and soft inside.",
-      "Pan-fry the pork chops over medium-high heat for about 4-5 minutes per side, until golden and cooked through (63 °C / 145 °F inside), then rest them for about 3 minutes.",
+      "Heat the oven to 200 \u00b0C (400 \u00b0F). Cut the potatoes into chunks, toss with the oil and garlic and roast for 30 minutes, turning halfway, until golden and soft inside.",
+      "Pan-fry the pork chops over medium-high heat for about 4-5 minutes per side, until golden and cooked through (63 \u00b0C / 145 \u00b0F inside), then rest them for about 3 minutes.",
       "Steam the broccoli for about 4-5 minutes, until bright green and just tender, and serve with the chops and potatoes."
     ],
-    "nutritionPerServing": {"calories": 759, "carbsG": 51.6, "proteinG": 56.2, "fatG": 35.4, "sugarG": 3.8}
+    "nutritionPerServing": {
+      "calories": 759,
+      "carbsG": 51.6,
+      "proteinG": 56.2,
+      "fatG": 35.4,
+      "sugarG": 3.8,
+      "sodiumMg": 169,
+      "fiberG": 8.3
+    }
   }
 ]

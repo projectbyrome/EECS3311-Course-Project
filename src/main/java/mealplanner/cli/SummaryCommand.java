@@ -32,7 +32,7 @@ public class SummaryCommand extends AbstractCliCommand {
         return """
                 summary day  [yyyy-mm-dd]      (today if left out; may ask Claude for the summary)
                 summary week [yyyy-mm-dd]      (the Monday-to-Sunday week that holds the date)
-                summary goal [--calories 2000] [--protein 50] [--carbs 275] [--fat 78]
+                summary goal [--calories 2000] [--protein 50] [--carbs 275] [--fat 78] [--fibre 28] [--sodium 2300]
                   with no options it shows the daily goal; options left out keep their value""";
     }
 
@@ -79,7 +79,9 @@ public class SummaryCommand extends AbstractCliCommand {
                 number(args, "calories", current.getCalories()),
                 number(args, "protein", current.getProteinG()),
                 number(args, "carbs", current.getCarbsG()),
-                number(args, "fat", current.getFatG()));
+                number(args, "fat", current.getFatG()),
+                number(args, "fibre", number(args, "fiber", current.getFiberG())),
+                number(args, "sodium", current.getSodiumMg()));
         ValidationReport report = facade.updateGoal(goal);
         if (!report.isValid()) {
             return CommandResult.error("Goal not saved: " + String.join("; ", report.getViolations()));

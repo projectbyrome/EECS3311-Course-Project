@@ -83,7 +83,7 @@ public class ProfileService {
         return report;
     }
 
-    /** F10 (UC10 5a): every value must be greater than 0. Valid goals are saved in the profile. */
+    /** F10 (UC10 5a): calories, protein, carbs and fat must be greater than 0 (fibre and sodium may be 0 = no goal). Valid goals are saved in the profile. */
     public ValidationReport updateGoal(NutritionGoal goal) {
         ValidationReport report = new ValidationReport();
         if (goal == null) {
@@ -94,6 +94,7 @@ public class ProfileService {
         if (!(goal.getProteinG() > 0)) report.add("Protein must be greater than 0");
         if (!(goal.getCarbsG() > 0)) report.add("Carbohydrates must be greater than 0");
         if (!(goal.getFatG() > 0)) report.add("Fat must be greater than 0");
+        // fibre and sodium may be 0, which means "no goal"
         if (report.isValid()) {
             UserProfile profile = getProfile();
             profile.setDefaultGoal(goal);

@@ -80,8 +80,8 @@ public class SearchCatalogTool extends AbstractTool {
             m.put("ingredients", r.ingredients().stream().map(RecipeIngredient::toString).toList());
             NutritionSummary n = r.getNutritionPerServing();
             if (n != null) {
-                m.put("perServing", String.format("%.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat",
-                        n.getCalories(), n.getProteinG(), n.getCarbsG(), n.getFatG()));
+                m.put("perServing", String.format("%.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat, %s fibre, %s sodium",
+                        n.getCalories(), n.getProteinG(), n.getCarbsG(), n.getFatG(), n.fiberText(), n.sodiumText()));
             }
             out.add(m);
         }

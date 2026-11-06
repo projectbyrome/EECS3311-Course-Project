@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import mealplanner.domain.Ingredient;
+import mealplanner.domain.Recipe;
 
 /** The one SQLite database shared by every repository. */
 public class Database {
@@ -138,6 +139,8 @@ public class Database {
             addColumnIfMissing(st, "recipe", "nutrition", "TEXT");                  // F08: nutrition per serving
             addColumnIfMissing(st, "meal_entry", "notes", "TEXT NOT NULL DEFAULT ''"); // F01: meal notes
             addColumnIfMissing(st, "pantry_item", "staple_status", "TEXT");        // F04: staples (null = ingredient)
+            addColumnIfMissing(st, "profile", "goal_fiber", "REAL NOT NULL DEFAULT 28");    // daily fibre goal (min, g)
+            addColumnIfMissing(st, "profile", "goal_sodium", "REAL NOT NULL DEFAULT 2300"); // daily sodium goal (max, mg)
         } catch (SQLException e) {
             throw new DataAccessException("Migration failed", e);
         }
@@ -184,6 +187,33 @@ public class Database {
     }
 
     /**
+     * Gives an existing database the sodium and fibre of the catalogue recipes. Only nutrition saved before
+     * they were tracked (no "sodiumMg" in it) is replaced; library copies of catalogue recipes are updated too.
+     * Other library recipes get them when they are saved again (USDA is asked again for their ingredients).
+     */
+    private void addSodiumAndFiber(Connection c, SeedLoader loader) throws SQLException {
+        try (PreparedStatement catalog = c.prepareStatement(
+                "UPDATE catalog_recipe SET nutrition = ? WHERE name = ? AND (nutrition IS NULL OR nutrition NOT LIKE '%sodiumMg%')");
+             PreparedStatement library = c.prepareStatement(
+                     "UPDATE recipe SET nutrition = ? WHERE name = ? AND catalog_id IS NOT NULL AND nutrition NOT LIKE '%sodiumMg%'")) {
+            for (Recipe r : loader.loadCatalog(CATALOG_JSON, new SqliteIngredientRepository(this))) {
+                if (r.getNutritionPerServing() == null || !r.getNutritionPerServing().hasSodiumAndFiber()) continue;
+                String json;
+                try {
+                    json = SqliteNutritionCacheRepository.toJson(r.getNutritionPerServing());
+                } catch (java.io.IOException e) {
+                    continue;
+                }
+                for (PreparedStatement ps : new PreparedStatement[] {catalog, library}) {
+                    ps.setString(1, json);
+                    ps.setString(2, r.getName());
+                    ps.executeUpdate();
+                }
+            }
+        }
+    }
+
+    /**
      * Loads the bundled data. Ingredients are added with INSERT OR IGNORE on every start, so names added to
      * ingredients.json in a later version reach an existing database (existing rows are never changed).
      * The recipe catalogue is loaded only when its table is empty.
@@ -217,6 +247,8 @@ public class Database {
                 c.commit();
             }
             updateRecipeSteps(c, loader);
+            c.commit();
+            addSodiumAndFiber(c, loader);
             c.commit();
         } catch (SQLException e) {
             throw new DataAccessException("Cannot load the bundled data", e);

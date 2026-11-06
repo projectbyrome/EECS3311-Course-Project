@@ -39,7 +39,7 @@ import mealplanner.events.EventListener;
 /**
  * The Home page ("Today"): today's meals, today's daily goals, and a tile for each feature.
  * Clicking a tile opens that page in the side menu. Listens for calendar, pantry, profile and checklist
- * changes so the numbers stay current. Colours come from Theme (style classes) and the slot colours of the calendar.
+ * changes so the numbers stay current
  */
 public class HomeView extends ScrollPane implements EventListener {
 
@@ -131,7 +131,9 @@ public class HomeView extends ScrollPane implements EventListener {
         Label goalTitle = new Label("Today's goals");
         goalTitle.getStyleClass().add("card-title");
         Label goals = new Label(String.format("%.0f kcal%n%.0f g protein  ·  %.0f g carbs  ·  %.0f g fat",
-                goal.getCalories(), goal.getProteinG(), goal.getCarbsG(), goal.getFatG()));
+                goal.getCalories(), goal.getProteinG(), goal.getCarbsG(), goal.getFatG())
+                + (goal.getFiberG() > 0 ? String.format("  ·  %.0f g fibre", goal.getFiberG()) : "")
+                + (goal.getSodiumMg() > 0 ? String.format("  ·  %.0f mg sodium max", goal.getSodiumMg()) : ""));
         goals.getStyleClass().add("description");
         goals.setWrapText(true);
         Button summary = new Button("Today's nutrition");

@@ -57,7 +57,7 @@ public class RecipeRecommender {
               "steps": ["Heat the oven to 200 °C (400 °F).",
                         "Whisk the miso with 1 tbsp water for about 30 seconds, until smooth, and brush it over the salmon.",
                         "Bake for about 12-15 minutes, until the salmon flakes easily and the glaze is browned at the edges."],
-              "nutritionPerServing": {"calories": 420, "proteinG": 35, "carbsG": 12, "fatG": 24}},
+              "nutritionPerServing": {"calories": 420, "proteinG": 35, "carbsG": 12, "fatG": 24, "sodiumMg": 780, "fiberG": 2}},
              "reason": "one short sentence for the user"}
             Write the steps of a new recipe in full; never shorten or leave out a step. Every step that takes time
             (whisking, kneading, frying, boiling, simmering, baking, roasting, resting, marinating, ...) gives a time

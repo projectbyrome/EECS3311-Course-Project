@@ -30,5 +30,8 @@ public class WrittenRecipe {
         public double proteinG;
         public double carbsG;
         public double fatG;
+        /** Null if Claude left it out. */
+        public Double sodiumMg;
+        public Double fiberG;
     }
 }

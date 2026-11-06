@@ -41,7 +41,7 @@ public class MacroGeneratorView extends BorderPane {
     private final ComboBox<String> ingredientBox = new ComboBox<>();
     private final TextField amountField = new TextField();
     private final ComboBox<Unit> unitBox = new ComboBox<>();
-    private final Label result = new Label("Press Calculate to see calories, carbohydrates, protein, fat, sugar and vitamins.");
+    private final Label result = new Label("Press Calculate to see calories, carbohydrates, protein, fat, sugar, fibre, sodium and vitamins.");
     private final Button calculate = new Button("Calculate");
 
     public MacroGeneratorView(AppFacade facade) {

@@ -101,7 +101,7 @@ public class UsdaFoodDataClient implements NutritionSource {
 
     /**
      * Reads the nutrients of one food (values are per 100 g). The summary is marked incomplete if
-     * energy, carbohydrate, protein or fat is missing. Missing sugar counts as 0.
+     * energy, carbohydrate, protein or fat is missing. Missing sugar, sodium or fibre counts as 0.
      */
     NutritionSummary parseFood(String body) {
         Map<String, Double> byNumber = new LinkedHashMap<>();
@@ -118,6 +118,8 @@ public class UsdaFoodDataClient implements NutritionSource {
         Double protein = first(byNumber, "203");
         Double fat = first(byNumber, "204");
         Double sugar = first(byNumber, "269", "269.3");
+        Double sodium = first(byNumber, "307");  // Sodium, Na (mg)
+        Double fiber = first(byNumber, "291");   // Fiber, total dietary (g)
         Map<String, Double> vitamins = new LinkedHashMap<>();
         VITAMINS.forEach((number, label) -> {
             if (byNumber.containsKey(number)) vitamins.put(label, byNumber.get(number));
@@ -125,7 +127,7 @@ public class UsdaFoodDataClient implements NutritionSource {
         boolean complete = calories != null && carbs != null && protein != null && fat != null;
         List<String> notes = complete ? List.of() : List.of("USDA has no full macro data for this food");
         return new NutritionSummary(orZero(calories), orZero(carbs), orZero(protein), orZero(fat), orZero(sugar),
-                vitamins, complete, notes);
+                orZero(sodium), orZero(fiber), vitamins, complete, notes);
     }
 
     private JsonNode readTree(String body) {

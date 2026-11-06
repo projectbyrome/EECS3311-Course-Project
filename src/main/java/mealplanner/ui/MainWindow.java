@@ -57,7 +57,7 @@ public class MainWindow {
         connectSummaryWindow(nutritionSummaryView);
         addPage("Shopping", "Checklists, and shopping lists made from your meals.", checklistView);
         addPage("Pantry", "What you have at home right now.", pantryView);
-        addPage("Macro Generator", "Calories, protein, carbs, fat and sugar for recipes and ingredients.", macroGeneratorView);
+        addPage("Macro Generator", "Calories, protein, carbs, fat, sugar, fibre and sodium for recipes and ingredients.", macroGeneratorView);
         addPage("Recipe Library", "Your own recipes: add, edit, remove and mark favourites.", recipeLibraryView);
         addPage("Recommendations", "Recipe ideas from the catalogue that fit your profile.", recommendationView);
         dietGuideView.setCookHandler(dish -> {

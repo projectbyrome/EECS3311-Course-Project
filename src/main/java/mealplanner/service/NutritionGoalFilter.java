@@ -17,7 +17,10 @@ public class NutritionGoalFilter implements RecipeFilter {
     private final NutritionService nutritionService;
 
     public NutritionGoalFilter(NutritionGoal goal, NutritionService nutritionService) {
-        this.goal = goal;
+        // the fibre minimum is left out here: one meal rarely has a third of a day's fibre, so it would hide most
+        // recipes (the day and week summaries still check it). The sodium maximum is kept.
+        this.goal = goal == null ? null : new NutritionGoal(goal.getCalories(), goal.getProteinG(), goal.getCarbsG(),
+                goal.getFatG(), 0, goal.getSodiumMg());
         this.nutritionService = nutritionService;
     }
 

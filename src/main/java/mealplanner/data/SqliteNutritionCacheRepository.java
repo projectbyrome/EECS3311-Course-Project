@@ -58,6 +58,8 @@ public class SqliteNutritionCacheRepository implements NutritionCacheRepository 
         o.put("proteinG", n.getProteinG());
         o.put("fatG", n.getFatG());
         o.put("sugarG", n.getSugarG());
+        if (!Double.isNaN(n.getSodiumMg())) o.put("sodiumMg", n.getSodiumMg()); // left out while unknown
+        if (!Double.isNaN(n.getFiberG())) o.put("fiberG", n.getFiberG());
         ObjectNode v = o.putObject("vitamins");
         n.getVitamins().forEach(v::put);
         o.put("complete", n.isComplete());
@@ -73,6 +75,7 @@ public class SqliteNutritionCacheRepository implements NutritionCacheRepository 
         o.path("notes").forEach(n -> notes.add(n.asText()));
         return new NutritionSummary(o.path("calories").asDouble(), o.path("carbsG").asDouble(),
                 o.path("proteinG").asDouble(), o.path("fatG").asDouble(), o.path("sugarG").asDouble(),
+                o.path("sodiumMg").asDouble(Double.NaN), o.path("fiberG").asDouble(Double.NaN),
                 vitamins, o.path("complete").asBoolean(true), notes);
     }
 }

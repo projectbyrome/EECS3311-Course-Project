@@ -64,8 +64,9 @@ public class WrittenRecipeConverter {
         }
         if (w.nutritionPerServing != null) {
             WrittenRecipe.Estimate e = w.nutritionPerServing;
-            recipe.setNutrition(new NutritionSummary(e.calories, e.carbsG, e.proteinG, e.fatG, 0, Map.of(), true,
-                    List.of(ESTIMATE_NOTE)));
+            recipe.setNutrition(new NutritionSummary(e.calories, e.carbsG, e.proteinG, e.fatG, 0,
+                    e.sodiumMg == null ? Double.NaN : e.sodiumMg, e.fiberG == null ? Double.NaN : e.fiberG,
+                    Map.of(), true, List.of(ESTIMATE_NOTE)));
         }
         return recipe;
     }
@@ -76,8 +77,8 @@ public class WrittenRecipeConverter {
         if (n == null || !n.getNotes().contains(ESTIMATE_NOTE)) {
             return null;
         }
-        return new NutritionSummary(n.getCalories(), n.getCarbsG(), n.getProteinG(), n.getFatG(), 0, Map.of(), true,
-                List.of(SAVED_NOTE));
+        return new NutritionSummary(n.getCalories(), n.getCarbsG(), n.getProteinG(), n.getFatG(), 0,
+                n.getSodiumMg(), n.getFiberG(), Map.of(), true, List.of(SAVED_NOTE));
     }
 
     /** Saves the ingredients the app did not know yet (id 0), so RecipeLibraryService.save() accepts them. */

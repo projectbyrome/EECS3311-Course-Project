@@ -47,6 +47,8 @@ public class ProfileView extends VBox implements EventListener {
     private final TextField protein = new TextField();
     private final TextField carbs = new TextField();
     private final TextField fat = new TextField();
+    private final TextField fiber = new TextField();
+    private final TextField sodium = new TextField();
     private final Label goalStatus = new Label();
     private final Button daySummaryButton = new Button("Today's summary");
     private final Button weekSummaryButton = new Button("This week's summary");
@@ -94,7 +96,7 @@ public class ProfileView extends VBox implements EventListener {
     public void onSaveGoals() {
         try {
             NutritionGoal goal = new NutritionGoal(number(calories, "Calories"), number(protein, "Protein"),
-                    number(carbs, "Carbohydrates"), number(fat, "Fat"));
+                    number(carbs, "Carbohydrates"), number(fat, "Fat"), number(fiber, "Fibre"), number(sodium, "Sodium"));
             ValidationReport report = facade.updateGoal(goal);
             if (report.isValid()) {
                 goalStatus.setStyle("-fx-text-fill: #4CC38A;");
@@ -114,9 +116,12 @@ public class ProfileView extends VBox implements EventListener {
     }
 
     private VBox goalsCard() {
-        for (TextField f : List.of(calories, protein, carbs, fat)) f.setPrefColumnCount(6);
+        for (TextField f : List.of(calories, protein, carbs, fat, fiber, sodium)) f.setPrefColumnCount(6);
         HBox fields = new HBox(12, field("Calories (kcal, max)", calories), field("Protein (g, min)", protein),
                 field("Carbohydrates (g, max)", carbs), field("Fat (g, max)", fat));
+        HBox moreFields = new HBox(12, field("Fibre (g, min)", fiber), field("Sodium (mg, max)", sodium));
+        Label zeroHint = new Label("Fibre and sodium: 0 means no goal.");
+        zeroHint.getStyleClass().add("description");
         Button saveGoals = new Button("Save goals");
         saveGoals.getStyleClass().add("primary");
         saveGoals.setOnAction(e -> onSaveGoals());
@@ -133,7 +138,8 @@ public class ProfileView extends VBox implements EventListener {
         status.managedProperty().bind(status.textProperty().isNotEmpty());
 
         return card("Daily goals", "What you aim to eat each day. Used by your meal summaries "
-                + "and the Recommendations filter. Values must be more than 0.", new VBox(12, fields, buttons, goalStatus));
+                        + "and the Recommendations filter. Calories, protein, carbs and fat must be more than 0.",
+                new VBox(12, fields, moreFields, zeroHint, buttons, goalStatus));
     }
 
     private static VBox field(String name, TextField input) {
@@ -164,6 +170,8 @@ public class ProfileView extends VBox implements EventListener {
         protein.setText(String.format("%.0f", goal.getProteinG()));
         carbs.setText(String.format("%.0f", goal.getCarbsG()));
         fat.setText(String.format("%.0f", goal.getFatG()));
+        fiber.setText(String.format("%.0f", goal.getFiberG()));
+        sodium.setText(String.format("%.0f", goal.getSodiumMg()));
     }
 
     /** UC06: updateProfile(profile); on problems nothing is saved and they are shown with suggestions. */

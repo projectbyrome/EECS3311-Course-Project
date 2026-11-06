@@ -45,6 +45,8 @@ public class GetProfileTool extends AbstractTool {
         goal.put("proteinG", p.getDefaultGoal().getProteinG());
         goal.put("carbsG", p.getDefaultGoal().getCarbsG());
         goal.put("fatG", p.getDefaultGoal().getFatG());
+        goal.put("fiberGMin", p.getDefaultGoal().getFiberG());
+        goal.put("sodiumMgMax", p.getDefaultGoal().getSodiumMg());
         out.put("dailyGoal", goal);
         return ToolResult.ok(toJson(out));
     }

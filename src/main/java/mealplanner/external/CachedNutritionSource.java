@@ -40,11 +40,18 @@ public class CachedNutritionSource implements NutritionSource {
     @Override
     public Optional<NutritionSummary> nutrientsFor(String fdcId) {
         Optional<NutritionSummary> cached = cache.find(fdcId);
-        if (cached.isPresent()) {
+        if (cached.isPresent() && cached.get().hasSodiumAndFiber()) {
             return cached;
         }
-        Optional<NutritionSummary> fetched = delegate.nutrientsFor(fdcId);
+        // not cached, or cached before sodium and fibre were tracked: ask USDA again (keep the old values if it fails)
+        Optional<NutritionSummary> fetched;
+        try {
+            fetched = delegate.nutrientsFor(fdcId);
+        } catch (RuntimeException e) {
+            if (cached.isPresent()) return cached;
+            throw e;
+        }
         fetched.ifPresent(n -> cache.save(fdcId, n));
-        return fetched;
+        return fetched.isPresent() ? fetched : cached;
     }
 }

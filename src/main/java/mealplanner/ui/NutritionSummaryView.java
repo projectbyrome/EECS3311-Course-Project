@@ -33,7 +33,7 @@ import mealplanner.model.DaySummary;
 /**
  * F10 GUI (SD07): the nutrition of a day or a week compared with the daily goals, Claude's short summary,
  * and a form to edit the goals. It opens in its own window when "Day nutrition" or "Week nutrition" is
- * clicked in the Meal Calendar. Colours come from Theme (style-class names).
+ * clicked in the Meal Calendar.
  */
 public class NutritionSummaryView extends HBox implements EventListener {
 
@@ -51,6 +51,8 @@ public class NutritionSummaryView extends HBox implements EventListener {
     private final TextField protein = new TextField();
     private final TextField carbs = new TextField();
     private final TextField fat = new TextField();
+    private final TextField fiber = new TextField();
+    private final TextField sodium = new TextField();
     private final Label goalMessage = new Label();
     /** What is shown now, so events can redraw it: a day, or a week start when showingWeek. */
     private LocalDate shown;
@@ -267,7 +269,9 @@ public class NutritionSummaryView extends HBox implements EventListener {
         grid.addRow(1, small("Protein (g, min)"), protein);
         grid.addRow(2, small("Carbohydrates (g, max)"), carbs);
         grid.addRow(3, small("Fat (g, max)"), fat);
-        for (TextField f : List.of(calories, protein, carbs, fat)) f.setPrefColumnCount(6);
+        grid.addRow(4, small("Fibre (g, min; 0 = none)"), fiber);
+        grid.addRow(5, small("Sodium (mg, max; 0 = none)"), sodium);
+        for (TextField f : List.of(calories, protein, carbs, fat, fiber, sodium)) f.setPrefColumnCount(6);
         Button save = new Button("Save goals");
         save.getStyleClass().add("primary");
         save.setOnAction(e -> readGoalForm());
@@ -284,7 +288,7 @@ public class NutritionSummaryView extends HBox implements EventListener {
     private void readGoalForm() {
         try {
             onEditGoals(new NutritionGoal(number(calories, "Calories"), number(protein, "Protein"),
-                    number(carbs, "Carbohydrates"), number(fat, "Fat")));
+                    number(carbs, "Carbohydrates"), number(fat, "Fat"), number(fiber, "Fibre"), number(sodium, "Sodium")));
         } catch (AppException ex) {
             showGoalError(ex.getMessage());
         }
@@ -307,6 +311,8 @@ public class NutritionSummaryView extends HBox implements EventListener {
         protein.setText(String.format("%.0f", goal.getProteinG()));
         carbs.setText(String.format("%.0f", goal.getCarbsG()));
         fat.setText(String.format("%.0f", goal.getFatG()));
+        fiber.setText(String.format("%.0f", goal.getFiberG()));
+        sodium.setText(String.format("%.0f", goal.getSodiumMg()));
     }
 
     private void showGoalError(String message) {

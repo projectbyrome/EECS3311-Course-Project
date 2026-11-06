@@ -179,9 +179,9 @@ public class RecommendationView extends BorderPane {
         details.setWrapText(true);
         NutritionSummary n = recipe.getNutritionPerServing();
         Label nutrition = new Label(n == null ? "" : String.format(
-                (r.written ? "About" : "Per serving:") + " %.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat"
+                (r.written ? "About" : "Per serving:") + " %.0f kcal, %.0f g protein, %.0f g carbs, %.0f g fat, %s fibre, %s sodium"
                         + (r.written ? " per serving (Claude's estimate)" : ""),
-                n.getCalories(), n.getProteinG(), n.getCarbsG(), n.getFatG()));
+                n.getCalories(), n.getProteinG(), n.getCarbsG(), n.getFatG(), n.fiberText(), n.sodiumText()));
         Label ingredients = new Label("Ingredients: " + String.join(", ",
                 recipe.ingredients().stream().map(RecipeIngredient::toString).toList()));
         ingredients.getStyleClass().add("description");

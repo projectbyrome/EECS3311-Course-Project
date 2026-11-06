@@ -7,8 +7,7 @@ import mealplanner.domain.NutritionGoal;
 import mealplanner.domain.NutritionSummary;
 
 /**
- * F10 (SD07): one day's nutrition compared with the daily goal, and the short summary text
- * (written by Claude)
+ * F10 (SD07): one day's nutrition compared with the daily goal, and the short summary text (written by Claude)
  */
 public class DaySummary {
 
@@ -63,7 +62,23 @@ public class DaySummary {
         lines.add(line("Carbohydrates", totals.getCarbsG(), goal.getCarbsG(), "g", "max", misses, "carbohydrates"));
         lines.add(line("Fat", totals.getFatG(), goal.getFatG(), "g", "max", misses, "fat"));
         lines.add(String.format("Sugar: %.1f g (no goal)", totals.getSugarG()));
+        lines.add(optionalLine("Fibre", totals.getFiberG(), goal.getFiberG(), "g", "min", misses, "fibre",
+                "about 25-38 g a day is recommended"));
+        lines.add(optionalLine("Sodium", totals.getSodiumMg(), goal.getSodiumMg(), "mg", "max", misses, "sodium",
+                "under about 2300 mg a day is recommended"));
         return lines;
+    }
+
+    /** Fibre and sodium: "n/a" while unknown, and the usual guide when no goal is set. */
+    private static String optionalLine(String label, double actual, double target, String unit, String kind,
+                                       List<String> misses, String key, String guide) {
+        if (Double.isNaN(actual)) {
+            return String.format("%s: n/a%s", label, target > 0 ? String.format(" (goal %s %.0f %s)", kind, target, unit) : "");
+        }
+        if (target <= 0) {
+            return String.format("%s: %.0f %s (no goal; %s)", label, actual, unit, guide);
+        }
+        return line(label, actual, target, unit, kind, misses, key);
     }
 
     private static String line(String label, double actual, double target, String unit, String kind,
