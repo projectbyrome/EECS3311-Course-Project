@@ -65,7 +65,7 @@ public class PantryService {
         List<RecipeIngredient> missing = new ArrayList<>();
         for (RecipeIngredient need : recipe.scaledTo(servings)) {
             Ingredient ingredient = need.getIngredient();
-            Optional<PantryItem> item = pantryRepository.findByIngredient(ingredient.getId());
+            Optional<PantryItem> item = findInPantry(ingredient);
             if (item.isEmpty()) {
                 missing.add(need);
                 continue;
@@ -96,7 +96,7 @@ public class PantryService {
         List<String> warnings = new ArrayList<>();
         for (RecipeIngredient used : ingredients) {
             Ingredient ingredient = used.getIngredient();
-            Optional<PantryItem> found = pantryRepository.findByIngredient(ingredient.getId());
+            Optional<PantryItem> found = findInPantry(ingredient);
             if (found.isEmpty()) {
                 warnings.add(ingredient.getName() + " was used but is not in the pantry");
                 continue;
@@ -260,8 +260,10 @@ public class PantryService {
     }
 
     /**
-     * Shopping page summary (information only, nothing is changed): ingredients that are out of stock or
-     * that a planned meal on one of these days is missing or short of, and staples marked running low.
+     * Shopping page summary (information only, nothing is changed). "Missing" lists what you do not have:
+     * ingredients out of stock in the pantry, and ingredients a planned meal on one of these days uses that
+     * are not in the pantry at all. An ingredient you still have some of is not listed, even if a meal needs
+     * more (the amounts are checked when the meal is cooked). Staples marked running low are listed apart.
      */
     public PantryStatusSummary statusSummary(List<DayPlan> plannedDays) {
         TreeSet<String> missing = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -276,12 +278,38 @@ public class PantryService {
         for (DayPlan day : plannedDays) {
             if (day.isClosed()) continue;
             for (MealEntry meal : day.activeEntries()) {
-                for (RecipeIngredient need : missingFor(meal.getRecipe(), meal.getServings())) {
-                    missing.add(need.getIngredient().getName());
+                for (RecipeIngredient need : meal.getRecipe().ingredients()) {
+                    if (findInPantry(need.getIngredient()).isEmpty()) {
+                        missing.add(need.getIngredient().getName());
+                    }
                 }
             }
         }
         return new PantryStatusSummary(List.copyOf(missing), List.copyOf(runningLow));
+    }
+
+    /**
+     * The pantry item for this ingredient. Also finds it under the singular or plural name
+     * ("egg" and "eggs", "tomato" and "tomatoes"), because a recipe written by Claude may add its own
+     * ingredient with a slightly different name from the one in the pantry.
+     */
+    Optional<PantryItem> findInPantry(Ingredient ingredient) {
+        Optional<PantryItem> exact = pantryRepository.findByIngredient(ingredient.getId());
+        if (exact.isPresent()) {
+            return exact;
+        }
+        String name = ingredient.getName().trim().toLowerCase(Locale.ROOT);
+        for (PantryItem item : pantryRepository.findAll()) {
+            if (sameFood(name, item.getIngredient().getName().trim().toLowerCase(Locale.ROOT))) {
+                return Optional.of(item);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /** Same name, or one is the plural of the other (adds "s" or "es"). */
+    static boolean sameFood(String a, String b) {
+        return a.equals(b) || a.equals(b + "s") || b.equals(a + "s") || a.equals(b + "es") || b.equals(a + "es");
     }
 
     /** True if the name is in the ingredient list (the 57 built-in ones plus any added later). */
