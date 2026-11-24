@@ -3,7 +3,7 @@
 
 - Stage 2 report: [`stage2-report.pdf`](stage2-report.pdf)
 - Demo video: https://youtu.be/bQ--vuo2Hz0
-- UML diagrams: [`docs/diagrams`](docs/diagrams)
+- UML diagrams: in the Stage 2 report, Section 3.6
 - Standalone agent: [`Agent.jar`](#standalone-agent-agentjar)
 
 ## Features
