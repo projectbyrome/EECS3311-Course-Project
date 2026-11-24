@@ -51,7 +51,7 @@ public class ChatCommand extends AbstractCliCommand {
     }
 
     /** The answer, then the sample day with the command that finds or writes each recipe. */
-    static String show(DietGuideReply reply) {
+    public static String show(DietGuideReply reply) {
         StringBuilder sb = new StringBuilder(reply.asText());
         if (reply.hasSampleDay()) {
             sb.append("\n\nA day on this diet:");

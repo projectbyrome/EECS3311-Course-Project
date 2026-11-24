@@ -105,7 +105,7 @@ public class RecommendCommand extends AbstractCliCommand {
         return CommandResult.ok("Added to your recipe library: " + added.getName() + " (#" + added.getId() + ")." + warnings);
     }
 
-    private static String card(int number, Recommendation r) {
+    public static String card(int number, Recommendation r) {
         Recipe recipe = r.recipe;
         StringBuilder sb = new StringBuilder();
         sb.append(number).append(". ").append(recipe.getName())

@@ -1,0 +1,8 @@
+# A list of CLI commands, run in order (type "help" in the CLI to see them all).
+# Works with -LLMAPI none too.
+pantry add eggs 12 PIECE
+pantry list
+recipe list
+calendar add --date 2026-12-01 --slot DINNER --recipe 3 --servings 2
+calendar show --date 2026-12-01
+summary day 2026-12-01

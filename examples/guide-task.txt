@@ -1,0 +1,3 @@
+# Task for the AI Diet Guide (F11): one question about a diet.
+agent: guide
+What is the Mediterranean diet, and what does a normal day of eating look like?

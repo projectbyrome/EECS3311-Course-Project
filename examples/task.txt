@@ -1,0 +1,7 @@
+# Task for the recipe recommendation agent (F07).
+# Header lines (optional): agent, category, minutes, goal. The rest is the task in plain words.
+agent: recommend
+category: any
+minutes: 30
+goal: high-protein
+Something with chicken that I can make for dinner on a weeknight.

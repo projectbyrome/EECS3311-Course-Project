@@ -4,6 +4,7 @@
 - Stage 2 report: [`stage2-report.pdf`](stage2-report.pdf)
 - Demo video: https://youtu.be/bQ--vuo2Hz0
 - UML diagrams: [`docs/diagrams`](docs/diagrams)
+- Standalone agent: [`Agent.jar`](#standalone-agent-agentjar)
 
 ## Features
 
@@ -81,6 +82,105 @@ fav toggle 3
 summary day 2026-11-20
 chat what is the Mediterranean diet
 ```
+
+## Standalone agent (Agent.jar)
+
+`Agent.jar` runs the meal planner's AI agent from a terminal, with no window. You write the task in a text file and the agent runs it.
+
+Build it once (Maven puts it in `target/Agent.jar`, with every library inside):
+```
+mvn -q package
+```
+
+Run it:
+```
+java -jar target/Agent.jar -LLMAPI claude -input examples/task.txt
+```
+
+The API key is never an option on the command line. It is read from `ANTHROPIC_API_KEY`, as an environment variable or from the `.env` file in the folder you run the command from (see Setup).
+
+### Options
+
+| Option | Meaning |
+|---|---|
+| `-LLMAPI <claude\|none>` | The LLM to use. `claude` (default) calls the Anthropic Messages API with your `ANTHROPIC_API_KEY`. `none` runs offline with the app's fallbacks (no API key needed). `-LLMAPI` with no value means `claude`. |
+| `-input <file>` | The task file to run. Required. |
+| `-agent <name>` | `auto` (default), `recommend`, `guide` or `commands`. See below. |
+| `-model <id>` | Claude model id, e.g. `claude-haiku-5-5`. Default: `MEALPLANNER_MODEL`. |
+| `-db <file>` | Database file. Default: `MEALPLANNER_DB` or `~/.mealplanner/mealplanner.db`, the same data as the app. |
+| `-approve <n>` | `recommend` only: add recommendation number `n` to the recipe library. |
+| `-output <file>` | Also write the result to this file. |
+| `-help` | Show the options. |
+
+Options can also be written with two dashes (`--input`).
+
+### Agents
+
+| Agent | What it does with the task |
+|---|---|
+| `recommend` | The recipe recommendation agent (F07). Claude uses the `get_profile`, `search_recipe_library` and `search_recipe_catalog` tools in a loop, then returns up to 3 recipes with reasons. It can write a new recipe when the catalogue has too few. Every pick is re-checked against your allergies, diet and filters. |
+| `guide` | The AI Diet Guide (F11). The task is one question about a diet; the answer has the diet's sections and a sample day. |
+| `commands` | Each line of the file is a CLI command (the same ones as in the CLI above), run in order. |
+| `auto` | Picks one for you: `commands` if every line starts with a CLI command, `recommend` if the task talks about recipes or meals (recipe, cook, dinner, lunch, breakfast, snack, meal, dish, suggest...), otherwise `guide`. |
+
+### Task file
+
+Plain text. Lines starting with `#` are comments. Optional `key: value` lines at the top set the agent and the filters, and the rest is the task in your own words:
+
+| Header | Example | Meaning |
+|---|---|---|
+| `agent:` | `recommend` | Same as `-agent` (the `-agent` option wins) |
+| `category:` | `Curry`, `Rice Dishes`, `any` | Recipe category |
+| `minutes:` | `30` | Maximum cooking time |
+| `goal:` | `high-protein`, `low-calorie`, `low-carb`, `profile` | Nutrition goal |
+
+`examples/task.txt`:
+```
+agent: recommend
+category: any
+minutes: 30
+goal: high-protein
+Something with chicken that I can make for dinner on a weeknight.
+```
+
+### Working example
+
+With Claude (needs `ANTHROPIC_API_KEY`):
+```
+java -jar target/Agent.jar -LLMAPI claude -input examples/task.txt
+```
+The agent prints the task it understood, then up to 3 recipe cards with Claude's reason for each. Add one to your library with `-approve <number>`.
+
+Without a key, the same task runs offline and shows the first catalogue recipes that match the filters:
+```
+$ java -jar target/Agent.jar -LLMAPI none -input examples/task.txt
+Agent: recommend | LLM: none | task: examples/task.txt
+
+Task: any category, at most 30 min, daily goal min 120 g protein, request "Something with chicken that I can make for dinner on a weeknight."
+
+Claude is unavailable, so these are the first recipes that match your filters.
+1. Chicken Parmesan Pasta  [catalogue #2]  30 min, 738 kcal, 62 g protein per serving
+   Pan-Fried, Boiled, Pasta, Savory, Cheesy, Rich, Poultry, Pasta, Cheese
+
+2. Garlic Shrimp Linguine  [catalogue #3]  20 min, 554 kcal, 36 g protein per serving
+   Pan-Fried, Boiled, Pasta, Garlicky, Buttery, Citrusy, Shellfish, Seafood, Pasta
+
+3. Chicken Burrito Bowl  [catalogue #6]  25 min, 616 kcal, 41 g protein per serving
+   Pan-Fried, Bowls, Rice Dishes, Spicy, Savory, Citrusy, Poultry, Rice, Beans
+
+To add one to your library, run again with -approve <number>.
+```
+
+More examples:
+```
+java -jar target/Agent.jar -LLMAPI claude -input examples/task.txt -approve 1
+java -jar target/Agent.jar -LLMAPI claude -input examples/guide-task.txt -output answer.txt
+java -jar target/Agent.jar -LLMAPI none -input examples/commands-task.txt
+java -jar target/Agent.jar -LLMAPI claude -input examples/all-features.txt
+```
+Offline, the Diet Guide says that it needs Claude.
+
+Exit codes: `0` done, `1` the task could not be completed (for example no recipe found, or Claude unreachable for the Diet Guide), `2` wrong options, missing task file or missing API key.
 
 ## Project structure
 
