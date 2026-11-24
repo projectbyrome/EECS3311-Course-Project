@@ -3,8 +3,10 @@
 
 - Stage 2 report: [`EECS3311 Stage 2 Implementation Report.pdf`](EECS3311%20Stage%202%20Implementation%20Report.pdf)
 - Demo video: https://youtu.be/bQ--vuo2Hz0
-- UML diagrams: in the Stage 2 report, Section 3.6
 - Standalone agent: [`Agent.jar`](#standalone-agent-agentjar)
+- UML diagrams: in the Stage 2 report, Section 3.6
+- Feature screenshots (GUI and CLI for F01-F11): in the Stage 2 report, Screenshots section (pages 36-46)
+
 
 ## Features
 
